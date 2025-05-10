@@ -4,13 +4,17 @@ and their supported functions.
 '''
 
 import pickle
+from datetime import datetime
 
 
 class Sample:
-    def __init__(self, name, mass=None, make_time=None):
+    def __init__(self, name: str, mass: float = None, make_time: str = None):
         self.name = name
         self.mass = mass
-        self.make_time = make_time
+        self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
+
+    def set_make_time(self, make_time: str):
+        self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
 
     def selfIntroduction(self):
         print(f'Hi I am {self.name}')
