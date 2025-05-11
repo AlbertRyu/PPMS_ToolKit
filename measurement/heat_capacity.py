@@ -27,6 +27,12 @@ class HeatCapacityMeasurement(Measurement):
     def _load_data(self):
         with open(file=self.filepath, encoding='ISO-8859-1') as f:
             content = f.readlines()
+
+        # Locate the position where the data sart. 
+        for i, line in enumerate(content):
+            if line.strip() == "[Data]":
+                data_start = i + 1  # 数据部分从 [Data] 下一行开始
+                break
         return content
 
     def __repr__(self):

@@ -15,7 +15,7 @@ from measurement import Measurement
 class Sample:
     def __init__(self, name: str, mass: float = None, make_time: str = None):
         self.name = name
-        self.mass = mass
+        self.mass = mass # milligram
         self.make_time = \
             datetime.strptime(make_time, "%Y-%m-%d") if make_time else None
         self.measurements: list[Measurement] = []
@@ -35,3 +35,6 @@ class Sample:
     def load(filepath):
         with open(filepath, "rb") as f:
             return pickle.load(f)
+        
+    def __repr__(self):
+        return f'{self.name}, {self.mass}mg, made in {self.make_time.date()}'
