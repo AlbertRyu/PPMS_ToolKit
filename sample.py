@@ -23,9 +23,6 @@ class Sample:
     def set_make_time(self, make_time: str):
         self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
 
-    def selfIntroduction(self):
-        print(f'Hi I am {self.name}')
-
     def add_measurement(self, filepath, measurement_class):
         self.measurements.append(measurement_class(filepath))
 
