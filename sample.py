@@ -3,7 +3,7 @@ This modules defined each sample, their properties
 and their supported functions.
 
 The Samples should contains serveal Measurement and could
-be save into a .pickel file and reload some time again. 
+be save into a .pickel file and reload some time again.
 '''
 
 import pickle
@@ -15,12 +15,16 @@ class Sample:
         self.name = name
         self.mass = mass
         self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
+        self.measurements: list[Measuerment] = []
 
     def set_make_time(self, make_time: str):
         self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
 
     def selfIntroduction(self):
         print(f'Hi I am {self.name}')
+
+    def add_measurement(self, Filepath):
+        pass
 
     def save(self):
         with open(f"{self.name}.pkl", "wb") as f:
