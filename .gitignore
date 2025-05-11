@@ -1,5 +1,6 @@
 Icon*
 *.pkl
 code_test.ipynb
+reference_code/
 __pycache__/
 *.py[cod]
