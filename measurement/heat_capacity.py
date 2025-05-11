@@ -54,6 +54,29 @@ class HeatCapacityMeasurement(Measurement):
 
         return raw_df, df
 
+    def plot(self):
+        '''Create a standard plot of Heat Capacity Measurement'''
+        import matplotlib.pyplot as plt
+        plt.rcParams['axes.grid'] = True
+
+        fig, ax = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
+
+        # The first graph is a Samp HC v.s. T
+        ax[0].scatter(x=self.dataframe['Puck Temp (Kelvin)'],
+                      y=self.dataframe['Samp HC (µJ/K)'])
+        ax[0].set_xlabel('Puck Temp (Kelvin)')
+        ax[0].set_ylabel('Samp HC (µJ/K)')
+
+        ax[1].scatter(x=self.dataframe['Puck Temp (Kelvin)'],
+                      y=self.dataframe['Samp HC/Temp (µJ/K/K)'])
+        ax[1].set_xlabel('Puck Temp (Kelvin)')
+        ax[1].set_ylabel('Samp HC/Temp (µJ/K/K)')
+
+        fig.suptitle(f'{self.sample.name if self.sample
+                        else "Unknown Sample"} under {self.field_strength} Oe')
+
+        return fig, ax
+
     def __repr__(self):
         sample_name = self.sample.name if self.sample else "Unknown Sample"
         return f'HC exp, {sample_name} with {self.field_strength} Oe'
