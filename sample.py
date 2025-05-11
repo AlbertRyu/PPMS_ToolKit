@@ -1,6 +1,9 @@
 '''
 This modules defined each sample, their properties
 and their supported functions.
+
+The Samples should contains serveal Measurement and could
+be save into a .pickel file and reload some time again. 
 '''
 
 import pickle
