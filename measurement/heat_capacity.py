@@ -20,7 +20,7 @@ class HeatCapacityMeasurement(Measurement):
                  metadata=None
                  ):
         self.field_strength = field_strength
-        if sample:  # If sample is input, add this mesurement in the sample.
+        if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
         super().__init__(filepath, sample, metadata)
 
