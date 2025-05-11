@@ -16,7 +16,8 @@ class Sample:
     def __init__(self, name: str, mass: float = None, make_time: str = None):
         self.name = name
         self.mass = mass
-        self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
+        self.make_time = \
+            datetime.strptime(make_time, "%Y-%m-%d") if make_time else None
         self.measurements: list[Measurement] = []
 
     def set_make_time(self, make_time: str):
