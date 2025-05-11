@@ -16,7 +16,7 @@ class Measurement(ABC):
         self.filepath = filepath
         self.sample = sample
         self.metadata = metadata or {}
-        self.data = self._load_data()
+        self.raw_dataframe, self.dataframe = self._load_data()
 
     @abstractmethod
     def _load_data(self):

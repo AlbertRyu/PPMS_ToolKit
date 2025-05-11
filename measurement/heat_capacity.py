@@ -25,15 +25,34 @@ class HeatCapacityMeasurement(Measurement):
         super().__init__(filepath, sample, metadata)
 
     def _load_data(self):
+        import pandas as pd
+
         with open(file=self.filepath, encoding='ISO-8859-1') as f:
             content = f.readlines()
 
-        # Locate the position where the data sart. 
-        for i, line in enumerate(content):
-            if line.strip() == "[Data]":
-                data_start = i + 1  # 数据部分从 [Data] 下一行开始
-                break
-        return content
+        # Data start after the Line [Data].
+        data_start_line = content.index('[Data]\n') + 1
+        data = content[data_start_line:]
+        splitted_data = [line.split(',') for line in data]
+
+        raw_df = pd.DataFrame(data=splitted_data[1:], columns=splitted_data[0])
+
+        # Remove the comment lines.
+        df = raw_df[raw_df['Comment ()'] == '']
+        # Convert all str into Floats
+        df = df.apply(pd.to_numeric, errors='coerce')
+
+        keys_to_keep = ['Time Stamp (Seconds)',
+                        'Puck Temp (Kelvin)',
+                        'Samp HC (µJ/K)',
+                        'Samp HC/Temp (µJ/K/K)',
+                        'Samp HC Err (µJ/K)',
+                        'Field (Oersted)']
+
+        # Only Keep these columns and reindex.
+        df = df[keys_to_keep].reset_index(drop=True)
+
+        return raw_df, df
 
     def __repr__(self):
         sample_name = self.sample.name if self.sample else "Unknown Sample"
