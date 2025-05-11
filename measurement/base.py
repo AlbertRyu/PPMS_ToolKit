@@ -4,11 +4,17 @@ a backbone for its desecendent class, [HeatCapacityMeasurment],
 [Magnetism Measurement], etc.
 '''
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sample import Sample  # Avoid Cylic-Import
 
 
 class Measurement(ABC):
-    def __init__(self, filepath: str, metadata: dict = None):
+    def __init__(self, filepath: str,
+                 sample: "Sample" = None,
+                 metadata: dict = None):
         self.filepath = filepath
+        self.sample = sample
         self.metadata = metadata or {}
         self.data = self._load_data()
 

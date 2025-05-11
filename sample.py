@@ -23,8 +23,9 @@ class Sample:
     def set_make_time(self, make_time: str):
         self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
 
-    def add_measurement(self, filepath, measurement_class):
-        self.measurements.append(measurement_class(filepath))
+    def add_measurement(self, m: Measurement):
+        self.measurements.append(m)
+        m.sample = self  # double-linked with the measurement
 
     def save(self):
         with open(f"{self.name}.pkl", "wb") as f:
