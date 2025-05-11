@@ -9,5 +9,6 @@ from .base import Measurement
 
 class HeatCapacityMeasurement(Measurement):
     def _load_data(self):
-        data = pd.read_csv(self.filepath)
-        return data
+        with open(file=self.filepath, encoding='ISO-8859-1') as f:
+            content = f.readlines()
+        return content

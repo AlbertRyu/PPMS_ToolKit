@@ -26,8 +26,8 @@ class Sample:
     def selfIntroduction(self):
         print(f'Hi I am {self.name}')
 
-    def add_measurement(self, Filepath):
-        pass
+    def add_measurement(self, filepath, measurement_class):
+        self.measurements.append(measurement_class(filepath))
 
     def save(self):
         with open(f"{self.name}.pkl", "wb") as f:
