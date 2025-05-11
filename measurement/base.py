@@ -10,7 +10,7 @@ class Measurement(ABC):
     def __init__(self, filepath: str, metadata: dict = None):
         self.filepath = filepath
         self.metadata = metadata or {}
-        self.data = self._load_data
+        self.data = self._load_data()
 
     @abstractmethod
     def _load_data(self):
