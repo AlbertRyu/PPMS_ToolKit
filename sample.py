@@ -42,7 +42,8 @@ class Sample:
             return pickle.load(f)
 
     def __repr__(self):
-        return (f'id: {self.id}'
-                f'{self.name}'
-                f'{self.mass}mg,'
-                f'made in {self.make_time.date()}')
+        date = self.make_time.date() if self.make_time else "Unknwon Date"
+        return (f'id: {self.id}, '
+                f'{self.name}, '
+                f'{self.mass}mg, '
+                f'made in {date}.')
