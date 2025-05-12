@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sample import Sample  # Avoid Cylic-Import
 
-from utils import merge_by_temp_diff
+from .utils import merge_by_temp_diff
 
 
 class HeatCapacityMeasurement(Measurement):
