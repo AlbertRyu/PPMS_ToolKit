@@ -18,6 +18,11 @@ class Measurement(ABC):
         self.metadata = metadata or {}
         self.raw_dataframe, self.dataframe = self._load_data()
 
+    def __eq__(self, other):
+        if not isinstance(other, Measurement):
+            return False
+        return self.filepath == other.filepath and self.sample == other.sample
+
     @abstractmethod
     def _load_data(self):
         '''This Method have to be defined in the desendent class.'''

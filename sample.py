@@ -28,8 +28,12 @@ class Sample:
         self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
 
     def add_measurement(self, m: Measurement):
-        self.measurements.append(m)
-        m.sample = self  # double-linked with the measurement
+        if m not in self.measurements:
+            self.measurements.append(m)
+            m.sample = self  # double-linked with the measurement
+        else:
+            print(f'The Measurment [{m}] \n'
+                  f'is already exist in sample [{self}] ')
 
     def save(self):
         with open(f'id_{self.id if self.id else "None"}_'
