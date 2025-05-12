@@ -13,8 +13,12 @@ from measurement import Measurement
 
 
 class Sample:
-    def __init__(self, name: str, mass: float = None, make_time: str = None):
+    def __init__(self, name: str,
+                 id: float = None,
+                 mass: float = None,
+                 make_time: str = None):
         self.name = name
+        self.id = id
         self.mass = mass  # milligram
         self.make_time = \
             datetime.strptime(make_time, "%Y-%m-%d") if make_time else None
