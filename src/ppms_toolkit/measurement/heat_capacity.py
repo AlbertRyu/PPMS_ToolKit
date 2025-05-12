@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .utils import merge_by_temp_diff
+from .utils import merge_by_temp_diff, debye_model_extended, debye_model
 
 plt.rcParams['axes.grid'] = True  # Would like every plot to have grid
 
@@ -24,15 +24,18 @@ class HeatCapacityMeasurement(Measurement):
                  filepath: str,
                  sample: "Sample" = None,
                  field_strength: float = 0.0,
+                 comment: str = "",
                  metadata=None
                  ):
         self.field_strength = field_strength
-        super().__init__(filepath, sample, metadata)
+        super().__init__(filepath, sample, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
 
     def __repr__(self):
-        return f'HC exp, {self.sample_name} with {self.field_strength} Oe'
+        return (f'HC exp, {self.sample_name} '
+                f'with {self.field_strength} '
+                f'Oe {self.comment}')
 
     def _load_data(self):
 
@@ -54,7 +57,7 @@ class HeatCapacityMeasurement(Measurement):
         df = df.apply(pd.to_numeric, errors='coerce')
 
         keys_to_keep = ['Time Stamp (Seconds)',
-                        'Puck Temp (Kelvin)',
+                        'Sample Temp (Kelvin)',
                         'Samp HC (µJ/K)',
                         'Samp HC/Temp (µJ/K/K)',
                         'Samp HC Err (µJ/K)',
@@ -62,7 +65,9 @@ class HeatCapacityMeasurement(Measurement):
 
         # Only Keep these columns and reindex.
         df = df[keys_to_keep]
-        df = merge_by_temp_diff(df=df, temp_col='Puck Temp (Kelvin)', tol=0.01)
+        df = merge_by_temp_diff(df=df,
+                                temp_col='Sample Temp (Kelvin)',
+                                tol=0.01)
 
         return raw_df, df
 
@@ -71,14 +76,14 @@ class HeatCapacityMeasurement(Measurement):
         fig, ax = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
 
         # The first graph is a Samp HC v.s. T
-        ax[0].scatter(x=self.dataframe['Puck Temp (Kelvin)'],
+        ax[0].scatter(x=self.dataframe['Sample Temp (Kelvin)'],
                       y=self.dataframe['Samp HC (µJ/K)'])
-        ax[0].set_xlabel('Puck Temp (Kelvin)')
+        ax[0].set_xlabel('Sample Temp (Kelvin)')
         ax[0].set_ylabel('Samp HC (µJ/K)')
 
-        ax[1].scatter(x=self.dataframe['Puck Temp (Kelvin)'],
+        ax[1].scatter(x=self.dataframe['Sample Temp (Kelvin)'],
                       y=self.dataframe['Samp HC/Temp (µJ/K/K)'])
-        ax[1].set_xlabel('Puck Temp (Kelvin)')
+        ax[1].set_xlabel('Sample Temp (Kelvin)')
         ax[1].set_ylabel('Samp HC/Temp (µJ/K/K)')
 
         fig.suptitle(f'{self.sample_name} under {self.field_strength} Oe')
@@ -97,7 +102,7 @@ class HeatCapacityMeasurement(Measurement):
             def mask_func(T):
                 return np.full_like(T, True)
 
-        T = self.dataframe['Puck Temp (Kelvin)']
+        T = self.dataframe['Sample Temp (Kelvin)']
         HC = self.dataframe['Samp HC (µJ/K)']
 
         mask = mask_func(T)
@@ -118,3 +123,19 @@ class HeatCapacityMeasurement(Measurement):
         plt.legend()
 
         return T, subtracted, fig, ax, params
+
+    def background_subtraction_debye(
+            self, mask_func=lambda T: (T > 5) & (T < 300),
+            bounds=([1, 0.0001],
+                    [500, 100])
+                    ):
+        return self.background_subtraction(
+            mask_func, debye_model, bounds)
+
+    def background_subtraction_debye_extended(
+            self, mask_func=lambda T: (T > 5) & (T < 300),
+            bounds=([1, 0.0001, -np.inf, -np.inf],
+                    [500, 100, np.inf, np.inf])
+                    ):
+        return self.background_subtraction(
+            mask_func, debye_model_extended, bounds)

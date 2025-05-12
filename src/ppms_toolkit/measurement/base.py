@@ -12,9 +12,11 @@ if TYPE_CHECKING:
 class Measurement(ABC):
     def __init__(self, filepath: str,
                  sample: "Sample" = None,
+                 comment: str = '',
                  metadata: dict = None):
         self.filepath = filepath
         self.sample = sample
+        self.comment = comment
         self.metadata = metadata or {}
         self.raw_dataframe, self.dataframe = self._load_data()
 
