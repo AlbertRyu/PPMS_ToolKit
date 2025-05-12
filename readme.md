@@ -6,31 +6,56 @@ A lightweight Python toolkit for extracting, processing, and analyzing data from
 
 This light weight Python toolkit should helps you:
 
-1. Transform the raw_data in a more easy-to-operate format (Numpy Array or Pandas Dataframe)
-2. Plot the data for a quick review.
-3. Do some data processing. (e.g. Phonon background subtraction.)
-4. Fit the data and extract the fit parametees. (e.g. Currie Temperature)
+- 📂 **Transform** raw PPMS `.dat` files into convenient `NumPy` arrays or `pandas` DataFrames
+- 📈 **Visualize** experimental data quickly
+- 🧮 **Process** data, e.g., phonon background subtraction
+- 📊 **Fit** data to extract physical parameters (e.g., Curie temperature)
 
 ## Data Structure
 
 This kit essentially contains two object: Sample and Measurements
 
-**Sample** contains info such as Name, Mass, Make_time, etc for a Sample. It also contains a list of Measurements assigned to this sample.
+### 🧪 `Sample`
 
-**Measurement** contains info of a certain measurement, and contains different kinds of information and internal function depending on its kind.
+- Stores basic sample metadata: `name`, `mass`, `creation_time`, etc.
+- Maintains a list of associated measurements.
+- You can:
+  - Create a sample independently.
+  - Add measurements to it later.
 
-Sample and Measurement could be created and processed separetly, but they are recommended to be linked. Each Measurement should be assgined to a certain sample. But you could create and process a Measurement without asigning it to a sample. You could also create a sample with info but add measurements to it afterwards.
+### 📊 `Measurement`
 
-*Currently Supported Measurements:*
+- Represents a single experimental dataset.
+- Can exist independently or be assigned to a `Sample`.
+- Provides tools specific to the measurement type (e.g., heat capacity analysis).
+
+#### Supported Measurement Types
 
 ```text
-Measurements 
-├── HeatCapacityMeasurement 
-└── MagnetismMeasurement 
-    ├── MT 
-    └── MH 
+Measurement
+├── HeatCapacityMeasurement
+└── MagnetismMeasurement
+    ├── MT (Magnetization vs Temperature)
+    └── MH (Magnetization vs Field)
 ```
 
-## Save and Load
+## 💾 Save and Load
 
-After entering the experimental metadata (e.g. sample mass, name) and processing the .dat file, you can store the current state of the sample into a .pkl file using Python’s built-in pickle module. This allows for easy reloading without needing to reprocess the raw data.
+After parsing and processing your raw .dat file and entering experimental metadata (e.g., sample name, mass),
+you can save the current state of a Sample (including all measurements) using Python’s built-in pickle. For example. 
+
+```python
+ImportantSample = Sample(id=1, name="Mn-PEA", mass=1.88)
+ImportantSample.add_Measurement(some_measurement)
+
+ImportantSample.save()
+```
+A `.pkl` file contains all information and measurement of the sample with be created in the current directory. Next time, simply run
+
+```python
+ImportantSampleFromTimeAgo = Sample.load('Mn-PEA')
+```
+
+
+This allows you to reload fully processed samples without needing to re-run the initial parsing or metadata input.
+
