@@ -1,6 +1,6 @@
 # PPMS Data Processing Kit
 
-*Physical Property Measuring System*, short for PPMS, is a versatile instrument used to aquire physics properties of different kinds of sample to a good precision.
+A tiny python package which helps you to extract and process the data from *Physical Property Measuring System* (PPMS)
 
 ## Usage
 
