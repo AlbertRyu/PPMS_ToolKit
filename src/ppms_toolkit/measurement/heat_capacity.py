@@ -9,7 +9,7 @@ Heat Capcity's experiment condition:
 from .base import Measurement
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sample import Sample  # Avoid Cylic-Import
+    from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
 import matplotlib.pyplot as plt
 import numpy as np

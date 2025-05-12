@@ -6,7 +6,7 @@ a backbone for its desecendent class, [HeatCapacityMeasurment],
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sample import Sample  # Avoid Cylic-Import
+    from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
 
 class Measurement(ABC):
