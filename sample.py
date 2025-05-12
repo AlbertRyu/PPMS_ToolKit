@@ -32,7 +32,8 @@ class Sample:
         m.sample = self  # double-linked with the measurement
 
     def save(self):
-        with open(f"{self.name}.pkl", "wb") as f:
+        with open(f'id: {self.id if self.id else "None"},'
+                  f'{self.name}.pkl', "wb") as f:
             pickle.dump(self, f)
 
     @staticmethod
