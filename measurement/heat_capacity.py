@@ -1,5 +1,5 @@
 '''
-This module define the HeatCapacityMeasurment instance,
+This module define the [HeatCapacityMeasurment] instance,
 which is a descendant of [Measurement].
 
 Heat Capcity's experiment condition:
@@ -11,7 +11,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sample import Sample  # Avoid Cylic-Import
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 from .utils import merge_by_temp_diff
+
+plt.rcParams['axes.grid'] = True  # Would like every plot to have grid
 
 
 class HeatCapacityMeasurement(Measurement):
@@ -25,6 +30,9 @@ class HeatCapacityMeasurement(Measurement):
         super().__init__(filepath, sample, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
+
+    def __repr__(self):
+        return f'HC exp, {self.sample_name} with {self.field_strength} Oe'
 
     def _load_data(self):
 
@@ -60,9 +68,6 @@ class HeatCapacityMeasurement(Measurement):
 
     def plot(self):
         '''Create a standard plot of Heat Capacity Measurement'''
-        import matplotlib.pyplot as plt
-        plt.rcParams['axes.grid'] = True
-
         fig, ax = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
 
         # The first graph is a Samp HC v.s. T
@@ -76,11 +81,40 @@ class HeatCapacityMeasurement(Measurement):
         ax[1].set_xlabel('Puck Temp (Kelvin)')
         ax[1].set_ylabel('Samp HC/Temp (µJ/K/K)')
 
-        fig.suptitle(f'{self.sample.name if self.sample
-                        else "Unknown Sample"} under {self.field_strength} Oe')
+        fig.suptitle(f'{self.sample_name} under {self.field_strength} Oe')
 
         return fig, ax
 
-    def __repr__(self):
-        sample_name = self.sample.name if self.sample else "Unknown Sample"
-        return f'HC exp, {sample_name} with {self.field_strength} Oe'
+    def background_subtraction(self, mask_func=None, model=None, bounds=None):
+        from scipy.optimize import curve_fit
+
+        def default_model(T, A):
+            return A * T**3 + (1-A) * T
+
+        if not model:
+            model = default_model
+        if not mask_func:
+            def mask_func(T):
+                return np.full_like(T, True)
+
+        T = self.dataframe['Puck Temp (Kelvin)']
+        HC = self.dataframe['Samp HC (µJ/K)']
+
+        mask = mask_func(T)
+        T_fit = T[mask]
+        HC_fit = HC[mask]
+
+        params, _ = curve_fit(model, T_fit, HC_fit,
+                              bounds=bounds)
+        phonon_background = model(T, *params)
+        subtracted = HC - phonon_background
+
+        fig, ax = plt.subplots()
+
+        ax.plot(T, HC, label='Heat Capacity')
+        ax.plot(T, phonon_background, label='Phonon Background')
+        ax.plot(T, subtracted, label='Subtracted.')
+        plt.title(f'{self.sample_name} Phonon Background Subtraction')
+        plt.legend()
+
+        return T, subtracted, fig, ax, params

@@ -3,6 +3,8 @@ This module provide some useful util functions
 that might be used in general purpose
 '''
 import pandas as pd
+import numpy as np
+from scipy.integrate import quad
 
 
 def merge_by_temp_diff(df,
@@ -28,3 +30,41 @@ def merge_by_temp_diff(df,
         merged_rows.append(averaged)
 
     return pd.DataFrame(merged_rows)
+
+
+# Debye Model for Phonon
+R = 8.314  # J/(mol·K)
+
+
+def debye_integral(x):
+    return (x**4 * np.exp(x)) / (np.exp(x) - 1)**2
+
+
+def debye_model(T, theta_D, scale=1.0):
+    T = np.array(T)
+    C = []
+
+    for t in T:
+        if t == 0:
+            C.append(0.0)
+        else:
+            integral, _ = quad(debye_integral, 0, theta_D / t)
+            c = 9 * R * (t / theta_D)**3 * integral * scale
+            C.append(c)
+
+    return np.array(C)
+
+
+def debye_model_extended(T, theta_D, B, D, scale=1.0):
+    T = np.array(T)
+    C = []
+
+    for t in T:
+        if t == 0:
+            C.append(0.0)
+        else:
+            integral, _ = quad(debye_integral, 0, theta_D / t)
+            c = 9 * R * (t / theta_D)**3 * integral * scale
+            C.append(c)
+
+    return np.array(C) + B * T + D

@@ -18,6 +18,10 @@ class Measurement(ABC):
         self.metadata = metadata or {}
         self.raw_dataframe, self.dataframe = self._load_data()
 
+    @property
+    def sample_name(self):
+        return self.sample.name if self.sample else "Unknown Sample"
+
     def __eq__(self, other):
         if not isinstance(other, Measurement):
             return False
