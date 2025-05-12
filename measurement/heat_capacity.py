@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sample import Sample  # Avoid Cylic-Import
 
+from utils import merge_by_temp_diff
+
 
 class HeatCapacityMeasurement(Measurement):
     def __init__(self,
@@ -25,6 +27,7 @@ class HeatCapacityMeasurement(Measurement):
         super().__init__(filepath, sample, metadata)
 
     def _load_data(self):
+
         import pandas as pd
 
         with open(file=self.filepath, encoding='ISO-8859-1') as f:
@@ -50,7 +53,8 @@ class HeatCapacityMeasurement(Measurement):
                         'Field (Oersted)']
 
         # Only Keep these columns and reindex.
-        df = df[keys_to_keep].reset_index(drop=True)
+        df = df[keys_to_keep]
+        df = merge_by_temp_diff(df=df, temp_col='Puck Temp (Kelvin)', tol=0.01)
 
         return raw_df, df
 
