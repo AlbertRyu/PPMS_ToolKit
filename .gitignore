@@ -9,3 +9,6 @@ reference_code/
 # 忽略所有 .pyc 和 .pyo 编译文件
 **/*.pyc
 **/*.pyo
+
+*.egg-info/
+
