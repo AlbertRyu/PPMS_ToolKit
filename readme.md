@@ -1,6 +1,6 @@
 # PPMS Data Processing Kit
 
-A tiny python package which helps you to extract and process the data from *Physical Property Measuring System* (PPMS)
+A lightweight Python toolkit for extracting, processing, and analyzing data from the **Physical Property Measurement System (PPMS)**.
 
 ## Usage
 
