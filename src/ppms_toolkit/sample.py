@@ -9,7 +9,7 @@ be save into a .pickel file and reload some time again.
 import pickle
 from datetime import datetime
 
-from measurement import Measurement
+from .measurement import Measurement
 
 
 class Sample:
@@ -36,8 +36,8 @@ class Sample:
                   f'is already exist in sample [{self}] ')
 
     def save(self):
-        with open(f'id_{self.id if self.id else "None"}_'
-                  f'{self.name}.pkl', "wb") as f:
+        with open(f'{self.name}'
+                  f'(id_{self.id if self.id else "None"}).pkl', "wb") as f:
             pickle.dump(self, f)
 
     @staticmethod
