@@ -41,4 +41,7 @@ class Sample:
             return pickle.load(f)
 
     def __repr__(self):
-        return f'{self.name}, {self.mass}mg, made in {self.make_time.date()}'
+        return (f'id: {self.id}'
+                f'{self.name}'
+                f'{self.mass}mg,'
+                f'made in {self.make_time.date()}')
