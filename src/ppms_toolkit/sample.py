@@ -8,15 +8,15 @@ be save into a .pickel file and reload some time again.
 
 import pickle
 from datetime import datetime
-
+from typing import Optional
 from .measurement import Measurement
 
 
 class Sample:
     def __init__(self, name: str,
-                 id: float = None,
-                 mass: float = None,
-                 make_time: str = None):
+                 id: Optional[float] = None,
+                 mass: Optional[float] = None,
+                 make_time: Optional[str] = None):
         self.name = name
         self.id = id
         self.mass = mass  # milligram
