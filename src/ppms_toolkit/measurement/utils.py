@@ -37,7 +37,10 @@ R = 8.314  # J/(mol·K)
 
 
 def debye_integral(x):
-    return (x**4 * np.exp(x)) / (np.exp(x) - 1)**2
+    x = np.clip(x, 1e-10, 500)
+    ex = np.exp(x)
+    denom = (ex - 1)
+    return np.where(denom == 0, 0, x**4 * ex / denom**2)
 
 
 def debye_model(T, theta_D, scale=1.0):
@@ -48,7 +51,8 @@ def debye_model(T, theta_D, scale=1.0):
         if t == 0:
             C.append(0.0)
         else:
-            integral, _ = quad(debye_integral, 0, theta_D / t)
+            x_max = min(500, theta_D / t)
+            integral, _ = quad(debye_integral, 0, x_max)
             c = 9 * R * (t / theta_D)**3 * integral * scale
             C.append(c)
 

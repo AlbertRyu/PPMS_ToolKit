@@ -82,15 +82,9 @@ class HeatCapacityMeasurement(Measurement):
         return fig, ax
 
     def background_subtraction(self,
-                               mask_func=lambda T: np.full_like(T, True),
-                               model=None, bounds=None):
+                               mask_func=lambda T: T > 0,
+                               model=debye_model, bounds=None):
         from scipy.optimize import curve_fit
-
-        def default_model(T, A):
-            return A * T**3 + (1-A) * T
-
-        if not model:
-            model = default_model
 
         T = self.dataframe['Sample Temp (Kelvin)']
         HC = self.dataframe['Samp HC (µJ/K)']
@@ -99,8 +93,11 @@ class HeatCapacityMeasurement(Measurement):
         T_fit = T[mask]
         HC_fit = HC[mask]
 
-        params, _ = curve_fit(model, T_fit, HC_fit,
-                              bounds=bounds)
+        kwargs = {}
+        if bounds is not None:
+            kwargs['bounds'] = bounds
+
+        params, _ = curve_fit(model, T_fit, HC_fit, **kwargs)
         phonon_background = model(T, *params)
         subtracted = HC - phonon_background
 
