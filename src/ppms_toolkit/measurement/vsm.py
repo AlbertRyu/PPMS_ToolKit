@@ -16,6 +16,7 @@ class VSMMeasurement(Measurement):
     def __init__(self,
                  filepath: str,
                  sample_orientation: str,
+                 mode: str,
                  sample: Optional["Sample"] = None,
                  comment: str = "",
                  metadata=None
@@ -33,3 +34,13 @@ class VSMMeasurement(Measurement):
             raise ValueError("sample_orientation have to be "
                              "'In Plane' or 'Out of Plane'.")
         self._sample_orientation = value
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @mode.setter
+    def mode(self, value):
+        if value not in ("MH", "MT"):
+            raise ValueError("Mode can only be 'MH' or 'MT'")
+        self._mode = value
