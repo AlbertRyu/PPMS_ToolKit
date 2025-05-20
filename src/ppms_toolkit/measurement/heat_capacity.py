@@ -64,7 +64,7 @@ class HeatCapacityMeasurement(Measurement):
 
     def plot(self):
         '''Create a standard plot of Heat Capacity Measurement'''
-        fig, ax = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
+        fig, ax = plt.subplots(1, 2, figsize=(12, 4))
 
         # The first graph is a Samp HC v.s. T
         ax[0].scatter(x=self.dataframe['Sample Temp (Kelvin)'],
