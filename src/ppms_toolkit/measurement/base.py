@@ -4,11 +4,11 @@ a backbone for its desecendent class, [HeatCapacityMeasurment],
 [Magnetism Measurement], etc.
 '''
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
-from pandas import DataFrame
+import pandas as pd
 
 
 class Measurement(ABC):
@@ -20,11 +20,26 @@ class Measurement(ABC):
         self.sample = sample
         self.comment = comment
         self.metadata = metadata or {}
-        self.raw_dataframe, self.dataframe = self._load_data()
+        self.raw_dataframe, self.dataframe = self.load_data()
 
     @property
     def sample_name(self):
         return self.sample.name if self.sample else "Unknown Sample"
+
+    def load_data(self):
+        with open(file=self.filepath, encoding='ISO-8859-1') as f:
+            content = f.readlines()
+
+        # Data start after the Line [Data].
+        data_start_line = content.index('[Data]\n') + 1
+        data = content[data_start_line:]
+        splitted_data = [line.split(',') for line in data]
+
+        raw_df = pd.DataFrame(data=splitted_data[1:], columns=splitted_data[0])
+
+        df = self.process_data(raw_df)
+
+        return raw_df, df
 
     def __eq__(self, other):
         if not isinstance(other, Measurement):
@@ -32,6 +47,6 @@ class Measurement(ABC):
         return self.filepath == other.filepath and self.sample == other.sample
 
     @abstractmethod
-    def _load_data(self) -> Tuple[DataFrame, DataFrame]:
+    def process_data(self, raw_df) -> pd.DataFrame:
         '''This Method have to be defined in the desendent class.'''
         pass

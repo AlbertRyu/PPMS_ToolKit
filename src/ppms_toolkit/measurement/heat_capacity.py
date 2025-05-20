@@ -40,16 +40,7 @@ class HeatCapacityMeasurement(Measurement):
                 f'with {self.field_strength} '
                 f'Oe {self.comment}')
 
-    def _load_data(self) -> tuple[pd.DataFrame, pd.DataFrame]:
-        with open(file=self.filepath, encoding='ISO-8859-1') as f:
-            content = f.readlines()
-
-        # Data start after the Line [Data].
-        data_start_line = content.index('[Data]\n') + 1
-        data = content[data_start_line:]
-        splitted_data = [line.split(',') for line in data]
-
-        raw_df = pd.DataFrame(data=splitted_data[1:], columns=splitted_data[0])
+    def process_data(self, raw_df) -> pd.DataFrame:
 
         # Remove the comment lines.
         df = raw_df[raw_df['Comment ()'] == '']
@@ -69,7 +60,7 @@ class HeatCapacityMeasurement(Measurement):
                                 temp_col='Sample Temp (Kelvin)',
                                 tol=0.01)
 
-        return raw_df, df
+        return df
 
     def plot(self):
         '''Create a standard plot of Heat Capacity Measurement'''
