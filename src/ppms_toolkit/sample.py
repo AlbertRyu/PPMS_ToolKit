@@ -1,9 +1,5 @@
 '''
-This modules defined each sample, their properties
-and their supported functions.
 
-The Samples should contains serveal Measurement and could
-be save into a .pickel file and reload some time again.
 '''
 
 import pickle
@@ -13,6 +9,32 @@ from .measurement import Measurement
 
 
 class Sample:
+    '''
+    This modules defined each sample, their properties
+    and their supported functions.
+
+    The Samples should contains serveal Measurement and could
+    be save into a .pickel file and reload some time again.
+
+
+    Parameters
+    ----------
+    name : str
+        Name of the sample.
+    mass : float, optional
+        Mass of the sample, unit is mg.
+    id   : float, optional
+        Assign a unique id to the sample.
+    make_time: str
+        make time of the sample, in "%Y-%m-%d" format.
+
+
+    Attributes
+    ----------
+    measurements: list
+        a list of measurements assigned to this sample.
+     All the parameters.
+    '''
     def __init__(self, name: str,
                  id: Optional[float] = None,
                  mass: Optional[float] = None,
