@@ -90,7 +90,9 @@ class HeatCapacityMeasurement(Measurement):
 
         return fig, ax
 
-    def background_subtraction(self, mask_func=None, model=None, bounds=None):
+    def background_subtraction(self,
+                               mask_func=lambda T: np.full_like(T, True),
+                               model=None, bounds=None):
         from scipy.optimize import curve_fit
 
         def default_model(T, A):
@@ -98,9 +100,6 @@ class HeatCapacityMeasurement(Measurement):
 
         if not model:
             model = default_model
-        if not mask_func:
-            def mask_func(T):
-                return np.full_like(T, True)
 
         T = self.dataframe['Sample Temp (Kelvin)']
         HC = self.dataframe['Samp HC (µJ/K)']
