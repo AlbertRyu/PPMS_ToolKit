@@ -7,12 +7,15 @@ Heat Capcity's experiment condition:
 '''
 
 from .base import Measurement
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
 
 from .utils import merge_by_temp_diff, debye_model_extended, debye_model
 
@@ -22,7 +25,7 @@ plt.rcParams['axes.grid'] = True  # Would like every plot to have grid
 class HeatCapacityMeasurement(Measurement):
     def __init__(self,
                  filepath: str,
-                 sample: "Sample" = None,
+                 sample: Optional["Sample"] = None,
                  field_strength: float = 0.0,
                  comment: str = "",
                  metadata=None
@@ -37,10 +40,7 @@ class HeatCapacityMeasurement(Measurement):
                 f'with {self.field_strength} '
                 f'Oe {self.comment}')
 
-    def _load_data(self):
-
-        import pandas as pd
-
+    def _load_data(self) -> tuple[pd.DataFrame, pd.DataFrame]:
         with open(file=self.filepath, encoding='ISO-8859-1') as f:
             content = f.readlines()
 

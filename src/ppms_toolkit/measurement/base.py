@@ -4,16 +4,18 @@ a backbone for its desecendent class, [HeatCapacityMeasurment],
 [Magnetism Measurement], etc.
 '''
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Tuple
 if TYPE_CHECKING:
     from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
+
+from pandas import DataFrame
 
 
 class Measurement(ABC):
     def __init__(self, filepath: str,
-                 sample: "Sample" = None,
+                 sample: Optional["Sample"] = None,
                  comment: str = '',
-                 metadata: dict = None):
+                 metadata: Optional[dict] = None):
         self.filepath = filepath
         self.sample = sample
         self.comment = comment
@@ -30,6 +32,6 @@ class Measurement(ABC):
         return self.filepath == other.filepath and self.sample == other.sample
 
     @abstractmethod
-    def _load_data(self):
+    def _load_data(self) -> Tuple[DataFrame, DataFrame]:
         '''This Method have to be defined in the desendent class.'''
         pass
