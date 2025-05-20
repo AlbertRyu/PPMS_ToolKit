@@ -1,6 +1,6 @@
-## !still under production, please do not use!
+# PPMS Data Processing Kit
 
-# PPMS Data Processing Kit 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/AlbertRyu/PPMS_ToolKit/HEAD?urlpath=%2Fdoc%2Ftree%2Fexamples%2Fcode_example.ipynb)
 
 A lightweight Python toolkit for extracting, processing, and analyzing data from the **Physical Property Measurement System (PPMS)**.
 
