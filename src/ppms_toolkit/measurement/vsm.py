@@ -15,10 +15,21 @@ if TYPE_CHECKING:
 class VSMMeasurement(Measurement):
     def __init__(self,
                  filepath: str,
+                 sample_orientation: str,
                  sample: Optional["Sample"] = None,
-                 sample_ori: float = 0.0,
                  comment: str = "",
                  metadata=None
                  ):
-        self.
+        self.sample_orientation = sample_orientation
         super().__init__(filepath, sample, comment, metadata)
+
+    @property
+    def sample_orientation(self):
+        return self._sample_orientation
+
+    @sample_orientation.setter
+    def sample_orientation(self, value):
+        if value not in ("In Plane", "Out of Plane"):
+            raise ValueError("sample_orientation have to be "
+                             "'In Plane' or 'Out of Plane'.")
+        self._sample_orientation = value
