@@ -6,7 +6,7 @@ a backbone for its desecendent class, [HeatCapacityMeasurment],
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
-    from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
+    from ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
 import pandas as pd
 
@@ -27,8 +27,12 @@ class Measurement(ABC):
         return self.sample.name if self.sample else "Unknown Sample"
 
     def load_data(self):
-        with open(file=self.filepath, encoding='ISO-8859-1') as f:
-            content = f.readlines()
+        try:
+            with open(file=self.filepath, encoding='utf-8', errors="strict") as f:
+                content = f.readlines()
+        except UnicodeDecodeError:
+            with open(file=self.filepath, encoding='iso-8859-1') as f:
+                content = f.readlines()
 
         # Data start after the Line [Data].
         data_start_line = content.index('[Data]\n') + 1

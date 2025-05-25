@@ -9,7 +9,7 @@ VSM experiment condition:
 from .base import Measurement
 from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
-    from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
+    from ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
 
 class VSMMeasurement(Measurement):

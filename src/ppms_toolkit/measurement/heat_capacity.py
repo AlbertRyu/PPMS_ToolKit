@@ -9,7 +9,7 @@ Heat Capcity's experiment condition:
 from .base import Measurement
 from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
-    from src.ppms_toolkit.sample import Sample  # Avoid Cylic-Import
+    from ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
 
 import matplotlib.pyplot as plt
@@ -41,9 +41,11 @@ class HeatCapacityMeasurement(Measurement):
                 f'Oe {self.comment}')
 
     def process_data(self, raw_df) -> pd.DataFrame:
-
         # Remove the comment lines.
         df = raw_df[raw_df['Comment ()'] == '']
+        
+        # Remove the error Code, fix the corrupted error code.
+        df.columns = [col.replace('�', 'µ') for col in df.columns]
         # Convert all str into Floats
         df = df.apply(pd.to_numeric, errors='coerce')
 
@@ -109,7 +111,7 @@ class HeatCapacityMeasurement(Measurement):
         plt.title(f'{self.sample_name} Phonon Background Subtraction')
         plt.legend()
 
-        return T, subtracted, fig, ax, params
+        return fig, ax, params, T, subtracted
 
     def background_subtraction_debye(
             self, mask_func=lambda T: (T > 5) & (T < 300),
