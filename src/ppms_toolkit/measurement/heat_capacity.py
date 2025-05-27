@@ -48,16 +48,19 @@ class HeatCapacityMeasurement(Measurement):
         df.columns = [col.replace('�', 'µ') for col in df.columns]
         # Convert all str into Floats
         df = df.apply(pd.to_numeric, errors='coerce')
-
-        keys_to_keep = ['Time Stamp (Seconds)',
-                        'Sample Temp (Kelvin)',
-                        'Samp HC (µJ/K)',
-                        'Samp HC/Temp (µJ/K/K)',
-                        'Samp HC Err (µJ/K)',
-                        'Field (Oersted)']
-
-        # Only Keep these columns and reindex.
+ 
+        pattern = (     r'Time Stamp \(|'
+                r'Samp HC \(|'
+                r'Samp HC\/Temp \(|'
+                r'Sample Temp \(|'
+                r'Samp HC Err \(|'
+                r'Field \('
+                )
+     
+        cols = df.columns
+        keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
+
         df = merge_by_temp_diff(df=df,
                                 temp_col='Sample Temp (Kelvin)',
                                 tol=0.01)
@@ -67,17 +70,21 @@ class HeatCapacityMeasurement(Measurement):
     def plot(self):
         '''Create a standard plot of Heat Capacity Measurement'''
         fig, ax = plt.subplots(1, 2, figsize=(12, 4))
-
+        cols = self.dataframe.columns
+        sample_T = cols[cols.str.contains(r'Sample Temp \(')][0]
+        sample_HC = cols[cols.str.contains(r'Samp HC \(')][0]
+        sample_HC_over_T = cols[cols.str.contains(r'Samp HC\/Temp \(')][0]
+     
         # The first graph is a Samp HC v.s. T
-        ax[0].scatter(x=self.dataframe['Sample Temp (Kelvin)'],
-                      y=self.dataframe['Samp HC (µJ/K)'])
-        ax[0].set_xlabel('Sample Temp (Kelvin)')
-        ax[0].set_ylabel('Samp HC (µJ/K)')
+        ax[0].scatter(x=self.dataframe[sample_T],
+                      y=self.dataframe[sample_HC])
+        ax[0].set_xlabel(sample_T)
+        ax[0].set_ylabel(sample_HC)
 
-        ax[1].scatter(x=self.dataframe['Sample Temp (Kelvin)'],
-                      y=self.dataframe['Samp HC/Temp (µJ/K/K)'])
-        ax[1].set_xlabel('Sample Temp (Kelvin)')
-        ax[1].set_ylabel('Samp HC/Temp (µJ/K/K)')
+        ax[1].scatter(x=self.dataframe[sample_T],
+                      y=self.dataframe[sample_HC_over_T])
+        ax[1].set_xlabel(sample_T)
+        ax[1].set_ylabel(sample_HC_over_T)
 
         fig.suptitle(f'{self.sample_name} under {self.field_strength} Oe')
 
@@ -85,7 +92,7 @@ class HeatCapacityMeasurement(Measurement):
 
     def background_subtraction(self,
                                mask_func=lambda T: T > 0,
-                               model=debye_model, bounds=None):
+                               model=debye_model, bounds=None, p0=None):
         from scipy.optimize import curve_fit
 
         T = self.dataframe['Sample Temp (Kelvin)']
@@ -98,6 +105,8 @@ class HeatCapacityMeasurement(Measurement):
         kwargs = {}
         if bounds is not None:
             kwargs['bounds'] = bounds
+        if p0 is not None:
+            kwargs['p0'] = p0
 
         params, _ = curve_fit(model, T_fit, HC_fit, **kwargs)
         phonon_background = model(T, *params)

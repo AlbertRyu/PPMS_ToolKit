@@ -59,6 +59,11 @@ def debye_model(T, theta_D, scale=1.0):
     return np.array(C)
 
 
+def einstein_model(T, theta_E, scale=1.0):
+    x = theta_E / T
+    return 3 * R * (x**2) * np.exp(x) / (np.exp(x) - 1)**2 * scale
+
+
 def debye_model_extended(T, theta_D, B, D, scale=1.0):
     T = np.array(T)
     C = []
