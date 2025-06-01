@@ -8,6 +8,9 @@ VSM experiment condition:
 
 from .base import Measurement
 from typing import TYPE_CHECKING, Optional
+
+import pandas as pd
+
 if TYPE_CHECKING:
     from ppms_toolkit.sample import Sample  # Avoid Cylic-Import
 
@@ -23,6 +26,23 @@ class VSMMeasurement(Measurement):
                  ):
         self.sample_orientation = sample_orientation
         super().__init__(filepath, sample, comment, metadata)
+
+    def process_data(self, raw_df) -> pd.DataFrame:
+
+        df = raw_df.apply(pd.to_numeric, errors='coerce')
+ 
+        pattern = (     
+                r'^Temperature \(|'
+                r'Magnetic Field \(|'
+                r'Moment \(|'
+                r'M. Std. Err. \('
+                )
+     
+        cols = df.columns
+        keys_to_keep = cols[cols.str.contains(pattern)]
+        df = df[keys_to_keep]
+
+        return df
 
     @property
     def sample_orientation(self):
