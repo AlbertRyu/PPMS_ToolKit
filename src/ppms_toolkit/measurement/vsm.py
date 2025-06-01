@@ -9,6 +9,7 @@ VSM experiment condition:
 from .base import Measurement
 from typing import TYPE_CHECKING, Optional
 
+import numpy as np
 import pandas as pd
 
 if TYPE_CHECKING:
@@ -21,11 +22,13 @@ class VSMMeasurement(Measurement):
                  sample_orientation: str,
                  mode: str,
                  sample: Optional["Sample"] = None,
+                 field_strength = float,
                  comment: str = "",
                  metadata=None
                  ):
         self.sample_orientation = sample_orientation
         self.mode = mode
+        self.field_strength = field_strength
         super().__init__(filepath, sample, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
@@ -50,13 +53,8 @@ class VSMMeasurement(Measurement):
         if value not in ("MH", "MT"):
             raise ValueError("Mode can only be 'MH' or 'MT'")
         self._mode = value
-
-    def __repr__(self):
-        return (f'{self.mode} exp on {self.sample_name} '
-                f'with {self.sample_orientation} orientation'
-                f' {self.comment}')
     
-    def process_data(self, raw_df) -> pd.DataFrame:
+    def process_data(self, raw_df) -> pd.DataFrame:            
 
         df = raw_df.apply(pd.to_numeric, errors='coerce')
  
@@ -71,4 +69,19 @@ class VSMMeasurement(Measurement):
         keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
 
+        if self.mode == 'MT':
+            self.const_field = np.average(df.filter(regex='Magnetic Field')).round().astype(int)
+        else:
+            self.const_temp = np.average(df.filter(regex='Magnetic Field')).round(1)
+
         return df
+    
+    def __repr__(self):
+        if self.mode == 'MT':
+            return (f'{self.mode} exp on {self.sample_name} '
+                    f'with {self.sample_orientation} orientation '
+                    f'at {self.const_field} Oe')
+        else:
+            return (f'{self.mode} exp on {self.sample_name} '
+                    f'with {self.sample_orientation} orientation'
+                    f'at {self.const_temp}')
