@@ -72,7 +72,7 @@ class VSMMeasurement(Measurement):
         if self.mode == 'MT':
             self.const_field = np.average(df.filter(regex='Magnetic Field')).round().astype(int)
         else:
-            self.const_temp = np.average(df.filter(regex='Magnetic Field')).round(1)
+            self.const_temp = np.average(df.filter(regex='^Temperature')).round(1)
 
         return df
     
@@ -83,5 +83,5 @@ class VSMMeasurement(Measurement):
                     f'at {self.const_field} Oe')
         else:
             return (f'{self.mode} exp on {self.sample_name} '
-                    f'with {self.sample_orientation} orientation'
-                    f'at {self.const_temp}')
+                    f'with {self.sample_orientation} orientation '
+                    f'at {self.const_temp} K')
