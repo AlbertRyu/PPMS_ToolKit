@@ -25,24 +25,8 @@ class VSMMeasurement(Measurement):
                  metadata=None
                  ):
         self.sample_orientation = sample_orientation
+        self.mode = mode
         super().__init__(filepath, sample, comment, metadata)
-
-    def process_data(self, raw_df) -> pd.DataFrame:
-
-        df = raw_df.apply(pd.to_numeric, errors='coerce')
- 
-        pattern = (     
-                r'^Temperature \(|'
-                r'Magnetic Field \(|'
-                r'Moment \(|'
-                r'M. Std. Err. \('
-                )
-     
-        cols = df.columns
-        keys_to_keep = cols[cols.str.contains(pattern)]
-        df = df[keys_to_keep]
-
-        return df
 
     @property
     def sample_orientation(self):
@@ -64,3 +48,25 @@ class VSMMeasurement(Measurement):
         if value not in ("MH", "MT"):
             raise ValueError("Mode can only be 'MH' or 'MT'")
         self._mode = value
+
+    def __repr__(self):
+        return (f'{self.mode} exp on {self.sample_name} '
+                f'with {self.sample_orientation} orientation'
+                f' {self.comment}')
+    
+    def process_data(self, raw_df) -> pd.DataFrame:
+
+        df = raw_df.apply(pd.to_numeric, errors='coerce')
+ 
+        pattern = (     
+                r'^Temperature \(|'
+                r'Magnetic Field \(|'
+                r'Moment \(|'
+                r'M. Std. Err. \('
+                )
+     
+        cols = df.columns
+        keys_to_keep = cols[cols.str.contains(pattern)]
+        df = df[keys_to_keep]
+
+        return df
