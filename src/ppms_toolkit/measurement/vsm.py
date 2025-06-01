@@ -80,8 +80,8 @@ class VSMMeasurement(Measurement):
         if self.mode == 'MT':
             return (f'{self.mode} exp on {self.sample_name} '
                     f'with {self.sample_orientation} orientation '
-                    f'at {self.const_field} Oe')
+                    f'at {self.const_field}Oe')
         else:
             return (f'{self.mode} exp on {self.sample_name} '
                     f'with {self.sample_orientation} orientation '
-                    f'at {self.const_temp} K')
+                    f'at {self.const_temp}K')
