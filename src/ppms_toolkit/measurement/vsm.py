@@ -27,6 +27,8 @@ class VSMMeasurement(Measurement):
         self.sample_orientation = sample_orientation
         self.mode = mode
         super().__init__(filepath, sample, comment, metadata)
+        if sample:  # If sample is inputted, add this mesurement in the sample.
+            sample.add_measurement(self)
 
     @property
     def sample_orientation(self):
