@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 if TYPE_CHECKING:
     from ppms_toolkit.sample import Sample  # Avoid Cylic-Import
@@ -22,13 +23,11 @@ class VSMMeasurement(Measurement):
                  sample_orientation: str,
                  mode: str,
                  sample: Optional["Sample"] = None,
-                 field_strength = float,
                  comment: str = "",
                  metadata=None
                  ):
         self.sample_orientation = sample_orientation
         self.mode = mode
-        self.field_strength = field_strength
         super().__init__(filepath, sample, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
@@ -71,6 +70,14 @@ class VSMMeasurement(Measurement):
 
         if self.mode == 'MT':
             self.const_field = np.average(df.filter(regex='Magnetic Field')).round().astype(int)
+            import re
+            if re.search(r'ZFC', self.filepath):
+                self.condition = 'ZFC'
+            elif re.search(r'FC', self.filepath):
+                self.condition = 'FC'
+            else:
+                self.condition = 'Unknown Condition'
+
         else:
             self.const_temp = np.average(df.filter(regex='^Temperature')).round(1)
 
@@ -85,3 +92,25 @@ class VSMMeasurement(Measurement):
             return (f'{self.mode} exp on {self.sample_name} '
                     f'with {self.sample_orientation} orientation '
                     f'at {self.const_temp}K')
+        
+    def plot(self):
+
+        fig, ax = plt.subplots()
+        df = self.dataframe
+
+        if self.mode == 'MT':
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition}')
+            ax.set_xlabel('Temperature(K)')
+        elif self.mode == 'MH':
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{self.const_temp}K')
+            ax.set_xlabel('Magnetic Field(Oe)')
+        else:
+            print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
+        
+        ax.set_ylabel('Moment (emu)')
+        ax.set_title(f'{self.mode} - {self.sample_name} - {self.sample_orientation}')
+
+        plt.legend()
+        fig.tight_layout()
+
+        return fig, ax
