@@ -3,7 +3,7 @@
 '''
 
 import pickle
-from datetime import datetime
+from datetime import date
 from typing import Optional
 from .measurement import Measurement
 
@@ -25,8 +25,8 @@ class Sample:
         Mass of the sample, unit is mg.
     id   : float, optional
         Assign a unique id to the sample.
-    make_time: str
-        make time of the sample, in "%Y-%m-%d" format.
+    make_date: str
+        make date of the sample, in "%Y-%m-%d" format.
 
 
     Attributes
@@ -38,16 +38,16 @@ class Sample:
     def __init__(self, name: str,
                  id: Optional[float] = None,
                  mass: Optional[float] = None,
-                 make_time: Optional[str] = None):
+                 make_date: Optional[str] = None):
         self.name = name
         self.id = id
         self.mass = mass  # milligram
-        self.make_time = \
-            datetime.strptime(make_time, "%Y-%m-%d") if make_time else None
+        self.make_date = \
+            date.fromisoformat(make_date) if make_date else None
         self.measurements: list[Measurement] = []
 
-    def set_make_time(self, make_time: str):
-        self.make_time = datetime.strptime(make_time, "%Y-%m-%d")
+    def set_make_date(self, make_date: str):
+        self.make_date = date.fromisoformat(make_date)
 
     def add_measurement(self, m: Measurement):
         if m not in self.measurements:
@@ -59,7 +59,7 @@ class Sample:
 
     def save(self):
         with open(f'{self.name}'
-                  f'(id_{self.id if self.id else "None"}).pkl', "wb") as f:
+                  f'({self.make_date if self.make_date else "Unknown MakeTime"}).pkl', "wb") as f:
             pickle.dump(self, f)
 
     @staticmethod
@@ -68,7 +68,7 @@ class Sample:
             return pickle.load(f)
 
     def __repr__(self):
-        date = self.make_time.date() if self.make_time else "Unknwon Date"
+        date = self.make_date if self.make_date else "Unknwon Date"
         return (f'id: {self.id}, '
                 f'{self.name}, '
                 f'{self.mass}mg, '
