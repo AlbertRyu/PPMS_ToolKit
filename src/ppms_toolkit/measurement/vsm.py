@@ -55,7 +55,9 @@ class VSMMeasurement(Measurement):
             raise ValueError("Mode can only be 'MH' or 'MT'")
         self._mode = value
     
-    def process_data(self, raw_df) -> pd.DataFrame:            
+    def process_data(self, raw_df) -> pd.DataFrame:      
+        
+        import re
 
         df = raw_df.apply(pd.to_numeric, errors='coerce')
  
@@ -70,9 +72,13 @@ class VSMMeasurement(Measurement):
         keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
 
+        # Divide the Moment by sample_mass
+        for col in df.columns:
+            if re.match(r'Moment',col):
+                df[col] = df[col] / self.sample_mass
+
         if self.mode == 'MT':
             self.const_field = np.average(df.filter(regex='Magnetic Field')).round().astype(int)
-            import re
             if re.search(r'ZFC', self.filepath):
                 self.condition = 'ZFC'
             elif re.search(r'FC', self.filepath):
