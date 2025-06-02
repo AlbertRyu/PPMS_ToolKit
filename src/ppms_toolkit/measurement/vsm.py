@@ -30,7 +30,7 @@ class VSMMeasurement(Measurement):
         self.sample_orientation = sample_orientation
         self.mode = mode
         self.sample_mass = sample_mass
-        super().__init__(filepath, sample, comment, metadata)
+        super().__init__(filepath, sample, sample_mass, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
 
@@ -72,7 +72,7 @@ class VSMMeasurement(Measurement):
         keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
 
-        # Divide the Moment by sample_mass
+        # Divide the Moment by sample_mass, if there's none 1 sample mass.
         for col in df.columns:
             if re.match(r'Moment',col):
                 df[col] = df[col] / self.sample_mass

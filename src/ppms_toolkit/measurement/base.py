@@ -14,10 +14,21 @@ import pandas as pd
 class Measurement(ABC):
     def __init__(self, filepath: str,
                  sample: Optional["Sample"] = None,
+                 sample_mass: float = 1,
                  comment: str = '',
                  metadata: Optional[dict] = None):
         self.filepath = filepath
         self.sample = sample
+
+        # If the measurement is in its default mass 1, but it is assigned
+        # to a sample, it will try to use the sample's mass if its not none.
+        if self.sample_mass == 1:
+            if self.sample is not None:
+                    if self.sample.mass is None:
+                        pass
+                    else:
+                        self.sample_mass = self.sample.mass
+
         self.comment = comment
         self.metadata = metadata or {}
         self.raw_dataframe, self.dataframe = self.load_data()
