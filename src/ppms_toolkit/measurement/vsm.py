@@ -93,9 +93,11 @@ class VSMMeasurement(Measurement):
                     f'with {self.sample_orientation} orientation '
                     f'at {self.const_temp}K')
         
-    def plot(self):
+    def plot(self, ax=None):
+        
+        if ax is None:
+            fig, ax = plt.subplots()
 
-        fig, ax = plt.subplots()
         df = self.dataframe
 
         if self.mode == 'MT':
@@ -111,6 +113,5 @@ class VSMMeasurement(Measurement):
         ax.set_title(f'{self.mode} - {self.sample_name} - {self.sample_orientation}')
 
         plt.legend()
-        fig.tight_layout()
 
-        return fig, ax
+        return ax
