@@ -23,11 +23,13 @@ class VSMMeasurement(Measurement):
                  sample_orientation: str,
                  mode: str,
                  sample: Optional["Sample"] = None,
+                 sample_mass: float = 1,
                  comment: str = "",
                  metadata=None
                  ):
         self.sample_orientation = sample_orientation
         self.mode = mode
+        self.sample_mass = sample_mass
         super().__init__(filepath, sample, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
