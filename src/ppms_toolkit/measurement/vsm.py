@@ -56,7 +56,7 @@ class VSMMeasurement(Measurement):
         self._mode = value
     
     def process_data(self, raw_df) -> pd.DataFrame:      
-        
+
         import re
 
         df = raw_df.apply(pd.to_numeric, errors='coerce')
@@ -109,16 +109,16 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition} - {self.sample_orientation}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{self.const_temp}K')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{self.const_temp}K - {self.sample_orientation}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         ax.set_ylabel('Moment (emu)')
-        ax.set_title(f'{self.mode} - {self.sample_name} - {self.sample_orientation}')
+        ax.set_title(f'{self.mode} - {self.sample_name}')
 
         plt.legend()
 
