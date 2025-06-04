@@ -26,12 +26,13 @@ class HeatCapacityMeasurement(Measurement):
     def __init__(self,
                  filepath: str,
                  sample: Optional["Sample"] = None,
+                 sample_mass: float = 1,
                  field_strength: float = 0.0,
                  comment: str = "",
                  metadata=None
                  ):
         self.field_strength = field_strength
-        super().__init__(filepath, sample, comment, metadata)
+        super().__init__(filepath, sample, sample_mass, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
 
