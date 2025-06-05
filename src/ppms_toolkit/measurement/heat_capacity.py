@@ -40,7 +40,18 @@ class HeatCapacityMeasurement(Measurement):
     def __repr__(self):
         return (f'HC exp, {self.sample_name} '
                 f'with {self.field_strength} '
-                f'Oe {self.comment}')
+                f'Oe {self.comment}'
+                f'T-range {self.t_range}'
+                )
+    
+    def to_dict(self):
+        '''Return a dict for representation purpose'''
+
+        return {
+                "External field": getattr(self, "field_strength", None),
+                "Temp Range":     getattr(self, "t_range", None),
+                "instance": self
+        }
 
     def process_data(self, raw_df) -> pd.DataFrame:
         # Remove the comment lines.
@@ -66,6 +77,11 @@ class HeatCapacityMeasurement(Measurement):
         df = merge_by_temp_diff(df=df,
                                 temp_col='Sample Temp (Kelvin)',
                                 tol=0.01)
+        
+        # Get the range of T
+        minimum = df['Sample Temp (Kelvin)'].min()
+        maximum = df['Sample Temp (Kelvin)'].max()
+        self.t_range = f'{minimum:.1f} ~ {maximum:.1f}'
 
         return df
 

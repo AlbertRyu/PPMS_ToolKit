@@ -7,7 +7,7 @@ from datetime import date
 from typing import Optional
 
 import pandas as pd
-from IPython.display import display
+from IPython.display import display, Markdown
 
 from .measurement import Measurement,VSMMeasurement,HeatCapacityMeasurement
 
@@ -64,11 +64,13 @@ class Sample:
         if df_hc.empty:
             print("There's no HC measurements bind to this sample.")
         else:
+            display(Markdown("#### HeatCapacity Measurements List"))
             display(df_hc)
 
         if df_vsm.empty:
             print("There's no VSM measurements bind to this sample.")
         else:
+            display(Markdown("#### VSM Measurements List"))
             display(df_vsm)
         
     @property
@@ -87,7 +89,7 @@ class Sample:
         hc_rows = []
         for m in self._measurements:
             if isinstance(m, HeatCapacityMeasurement):
-                hc_rows.append(Measurement)
+                hc_rows.append(m.to_dict())
         df_hc =pd.DataFrame(hc_rows)
         return df_hc
         
