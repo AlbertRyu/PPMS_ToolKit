@@ -54,6 +54,16 @@ class VSMMeasurement(Measurement):
         if value not in ("MH", "MT"):
             raise ValueError("Mode can only be 'MH' or 'MT'")
         self._mode = value
+
+    def to_dict(self):
+        '''Return a dict for representation purpose'''
+        return {
+                "mode":      getattr(self, "mode", None),
+                "orientation":getattr(self, "sample_orientation", None),
+                "const temp": getattr(self, "const_temp", None),
+                "const field": getattr(self, "const_field", None),
+                "instance": self
+        }
     
     def process_data(self, raw_df) -> pd.DataFrame:      
 

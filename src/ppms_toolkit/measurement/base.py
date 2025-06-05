@@ -37,10 +37,6 @@ class Measurement(ABC):
     def sample_name(self):
         return self.sample.name if self.sample else "Unknown Sample"
 
-    def to_dict(self) -> dict:
-        '''Return the properties into dict, in order to represent by Dataframe'''
-        return dict(self.__dict__)
-
     def load_data(self):
         try:
             with open(file=self.filepath, encoding='utf-8', errors="strict") as f:

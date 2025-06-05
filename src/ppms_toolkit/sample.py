@@ -5,7 +5,11 @@
 import pickle
 from datetime import date
 from typing import Optional
-from .measurement import Measurement
+
+import pandas as pd
+from IPython.display import display
+
+from .measurement import Measurement,VSMMeasurement,HeatCapacityMeasurement
 
 
 class Sample:
@@ -44,14 +48,55 @@ class Sample:
         self.mass = mass  # milligram
         self.make_date = \
             date.fromisoformat(make_date) if make_date else None
-        self.measurements: list[Measurement] = []
+        self._measurements = []
 
+    @property
+    def measurements(self) -> tuple[pd.DataFrame, pd.DataFrame]:
+        '''Represent the measurement list as dataframes'''
+        df_vsm = self.measurements_vsm
+        df_hc = self.measurements_hc
+        return df_vsm, df_hc
+    
+    @property
+    def show_measurements(self):
+        df_vsm = self.measurements_vsm
+        df_hc = self.measurements_hc
+        if df_hc.empty:
+            print("There's no HC measurements bind to this sample.")
+        else:
+            display(df_hc)
+
+        if df_vsm.empty:
+            print("There's no VSM measurements bind to this sample.")
+        else:
+            display(df_vsm)
+        
+    @property
+    def measurements_vsm(self):
+        '''Represent the measurement list as pd.Dataframe'''
+        vsm_rows = []
+        for m in self._measurements:
+            if isinstance(m, VSMMeasurement):
+                vsm_rows.append(m.to_dict())
+        df_vsm = pd.DataFrame(vsm_rows)
+        return df_vsm
+
+    @property
+    def measurements_hc(self):
+        '''Represent the measurement list as pd.Dataframe'''
+        hc_rows = []
+        for m in self._measurements:
+            if isinstance(m, HeatCapacityMeasurement):
+                hc_rows.append(Measurement)
+        df_hc =pd.DataFrame(hc_rows)
+        return df_hc
+        
     def set_make_date(self, make_date: str):
         self.make_date = date.fromisoformat(make_date)
 
     def add_measurement(self, m: Measurement):
-        if m not in self.measurements:
-            self.measurements.append(m)
+        if m not in self._measurements:
+            self._measurements.append(m)
             m.sample = self  # double-linked with the measurement
         else:
             print(f'The Measurment [{m}] \n'
