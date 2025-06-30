@@ -89,6 +89,9 @@ class VSMMeasurement(Measurement):
 
         if self.mode == 'MT':
             self.const_field = np.average(df.filter(regex='Magnetic Field')).round().astype(int)
+            for col in df.columns:
+                if re.match(r'Moment',col):
+                    df['chi'] = df[col] / self.const_field
             if re.search(r'ZFC', self.filepath):
                 self.condition = 'ZFC'
             elif re.search(r'FC', self.filepath):
