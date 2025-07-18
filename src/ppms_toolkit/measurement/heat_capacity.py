@@ -60,8 +60,7 @@ class HeatCapacityMeasurement(Measurement):
         # Remove the error Code, fix the corrupted error code.
         df.columns = [col.replace('�', 'µ') for col in df.columns]
         # Convert all str into Floats
-        df = df.apply(pd.to_numeric, errors='coerce')
- 
+
         pattern = (     r'Time Stamp \(|'
                 r'Samp HC \(|'
                 r'Samp HC\/Temp \(|'
@@ -73,6 +72,7 @@ class HeatCapacityMeasurement(Measurement):
         cols = df.columns
         keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
+        df = df.apply(pd.to_numeric, errors='coerce')
 
         df = merge_by_temp_diff(df=df,
                                 temp_col='Sample Temp (Kelvin)',

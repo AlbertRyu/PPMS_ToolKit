@@ -66,11 +66,9 @@ class VSMMeasurement(Measurement):
         }
     
     def process_data(self, raw_df) -> pd.DataFrame:      
-
         import re
 
-        df = raw_df.apply(pd.to_numeric, errors='coerce')
- 
+
         pattern = (     
                 r'^Temperature \(|'
                 r'Magnetic Field \(|'
@@ -78,9 +76,10 @@ class VSMMeasurement(Measurement):
                 r'M. Std. Err. \('
                 )
      
-        cols = df.columns
+        cols = raw_df.columns
         keys_to_keep = cols[cols.str.contains(pattern)]
-        df = df[keys_to_keep]
+        df = raw_df[keys_to_keep].apply(pd.to_numeric, errors='coerce')
+
 
         # Divide the Moment by sample_mass, if there's none 1 sample mass.
         for col in df.columns:
@@ -103,6 +102,7 @@ class VSMMeasurement(Measurement):
             self.const_temp = np.average(df.filter(regex='^Temperature')).round(1)
 
         return df
+    
     
     def __repr__(self):
         if self.mode == 'MT':
