@@ -3,8 +3,10 @@
 '''
 
 import pickle
+import os
 from datetime import date
 from typing import Optional
+from multiprocessing import Pool, set_start_method
 
 import pandas as pd
 from IPython.display import display, Markdown
@@ -113,6 +115,48 @@ class Sample:
     def load(filepath):
         with open(filepath, "rb") as f:
             return pickle.load(f)
+
+    @staticmethod
+    def _vsm_measurement_reader(args):
+
+        path, orientation = args
+        if 'MT' in path:
+            mode =  'MT'
+        elif 'MH' in path:
+            mode =  'MH'
+        else:
+            raise ValueError(f'Mode is not contained in filename of {path}')
+    
+        m=VSMMeasurement(filepath=path, sample_orientation=orientation, mode=mode)
+
+        return m
+
+
+
+    def add_vsm_measurements_by_folder(self, folder_path):
+
+        """
+        bind multiple vsm measurement by folder name
+        """
+        if os.name != "posix":
+            set_start_method("spawn", force=True)
+
+        if 'IP' in folder_path:
+            orientation = "In Plane"
+        elif 'OOP' in folder_path:
+            orientation = "Out of Plane"
+        else:
+            raise ValueError(f'Orientation is not contained in folderpath {folder_path}')
+        
+        arg_list = [(folder_path + p, orientation) for p in os.listdir(folder_path)]
+
+        with Pool() as pool:
+            measurements = pool.map(Sample._vsm_measurement_reader, arg_list)
+
+        for m in measurements:
+            self.add_measurement(m)
+            print(f'{m} --- added')
+
 
     def __repr__(self):
         date = self.make_date if self.make_date else "Unknwon Date"
