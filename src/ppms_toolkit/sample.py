@@ -133,7 +133,7 @@ class Sample:
 
 
 
-    def add_vsm_measurements_by_folder(self, folder_path):
+    def add_vsm_measurements_by_folder(self, folder_path, paralelle=False):
 
         """
         bind multiple vsm measurement by folder name
@@ -150,12 +150,17 @@ class Sample:
         
         arg_list = [(folder_path + p, orientation) for p in os.listdir(folder_path)]
 
-        with Pool() as pool:
-            measurements = pool.map(Sample._vsm_measurement_reader, arg_list)
+        if paralelle:
+            with Pool() as pool:
+                print('')
+                measurements = pool.map(Sample._vsm_measurement_reader, arg_list)
 
-        for m in measurements:
-            self.add_measurement(m)
-            print(f'{m} --- added')
+            for m in measurements:
+                self.add_measurement(m)
+        else:
+            for args in arg_list:
+                m = Sample._vsm_measurement_reader(args)
+                self.add_measurement(m)
 
 
     def __repr__(self):

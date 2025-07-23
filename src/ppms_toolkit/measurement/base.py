@@ -57,9 +57,10 @@ class Measurement(ABC):
         return raw_df, df
 
     def __eq__(self, other):
+        from pathlib import Path
         if not isinstance(other, Measurement):
             return False
-        return self.filepath == other.filepath and self.sample == other.sample
+        return Path(self.filepath).resolve() == Path(other.filepath).resolve()
 
     @abstractmethod
     def process_data(self, raw_df) -> pd.DataFrame:
