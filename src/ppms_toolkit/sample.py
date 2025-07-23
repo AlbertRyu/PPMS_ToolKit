@@ -100,6 +100,7 @@ class Sample:
 
     def add_measurement(self, m: Measurement):
         if m not in self._measurements:
+            print(f'{m} (added)')
             self._measurements.append(m)
             m.sample = self  # double-linked with the measurement
         else:
