@@ -152,8 +152,7 @@ class Sample:
         arg_list = [(folder_path + p, orientation) for p in os.listdir(folder_path)]
 
         if paralelle:
-            with Pool() as pool:
-                print('')
+            with Pool() as pool: 
                 measurements = pool.map(Sample._vsm_measurement_reader, arg_list)
 
             for m in measurements:

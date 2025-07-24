@@ -7,7 +7,7 @@ import numpy as np
 from scipy.integrate import quad
 
 def merge_by_temp_diff(df,
-                       temp_col='Puck Temp (Kelvin)',
+                       temp_col='Sample Temp (Kelvin)',
                        tol=0.01):
 
     df_sorted = df.sort_values(by=temp_col).reset_index(drop=True)
@@ -17,6 +17,8 @@ def merge_by_temp_diff(df,
     group_ids = (temp_diffs > tol).cumsum()
 
     merged_df = df_sorted.groupby(group_ids).mean(numeric_only=True)
+
+    merged_df = merged_df.reset_index(drop=True)
 
     return merged_df
 

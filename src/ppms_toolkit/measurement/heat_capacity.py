@@ -75,7 +75,7 @@ class HeatCapacityMeasurement(Measurement):
         keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
         df = df.apply(pd.to_numeric, errors='coerce')
-
+        
         df = merge_by_temp_diff(df=df,
                                 temp_col='Sample Temp (Kelvin)',
                                 tol=0.01)
