@@ -54,6 +54,7 @@ class HeatCapacityMeasurement(Measurement):
         }
 
     def process_data(self, raw_df) -> pd.DataFrame:
+        import re
         # Remove the comment lines.
         df = raw_df[raw_df['Comment ()'] == '']
         
@@ -68,7 +69,8 @@ class HeatCapacityMeasurement(Measurement):
                 r'Samp HC Err \(|'
                 r'Field \('
                 )
-     
+
+
         cols = df.columns
         keys_to_keep = cols[cols.str.contains(pattern)]
         df = df[keys_to_keep]
@@ -77,6 +79,12 @@ class HeatCapacityMeasurement(Measurement):
         df = merge_by_temp_diff(df=df,
                                 temp_col='Sample Temp (Kelvin)',
                                 tol=0.01)
+        
+        # Divide the Moment by sample_mass, if there's none 1 sample mass.
+        pattern = re.compile(r'^(Samp HC \(|Samp HC/Temp \(|Samp HC Err \()')
+        for col in df.columns:
+            if pattern.match(col):
+                df[col] = df[col] / self.sample_mass
         
         # Get the range of T
         minimum = df['Sample Temp (Kelvin)'].min()
