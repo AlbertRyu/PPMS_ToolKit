@@ -122,6 +122,29 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi'), label = f'{self.const_field}Oe - {self.condition} - {self.sample_orientation}')
+            ax.set_xlabel('Temperature(K)')
+        elif self.mode == 'MH':
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi'), label = f'{self.const_temp}K - {self.sample_orientation}')
+            ax.set_xlabel('Magnetic Field(Oe)')
+        else:
+            print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
+        
+        ax.set_ylabel('Susceptibility (emu)')
+        ax.set_title(f'{self.mode} - {self.sample_name}')
+
+        plt.legend()
+
+        return ax
+    
+    def plot_magnetisation(self, ax=None):
+        
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        df = self.dataframe
+
+        if self.mode == 'MT':
             ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition} - {self.sample_orientation}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
@@ -130,9 +153,11 @@ class VSMMeasurement(Measurement):
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
-        ax.set_ylabel('Moment (emu)')
+        ax.set_ylabel('Moment (emu / gram)')
         ax.set_title(f'{self.mode} - {self.sample_name}')
 
         plt.legend()
 
         return ax
+
+    
