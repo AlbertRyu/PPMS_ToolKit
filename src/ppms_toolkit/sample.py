@@ -10,6 +10,7 @@ from multiprocessing import Pool, set_start_method
 
 import pandas as pd
 from IPython.display import display, Markdown
+import matplotlib.pyplot as plt
 
 from .measurement import Measurement,VSMMeasurement,HeatCapacityMeasurement
 
@@ -133,7 +134,6 @@ class Sample:
         return m
 
 
-
     def add_vsm_measurements_by_folder(self, folder_path, paralelle=False):
 
         """
@@ -169,3 +169,38 @@ class Sample:
                 f'{self.name}, '
                 f'{self.mass}mg, '
                 f'made in {date}.')
+    
+    def plot_vsm(self, mode, orientation = None, ax=None, field=None, temperature=None, condition=None):
+
+        if not ax:
+            fig ,ax = plt.subplots()
+
+        df = self.measurements_vsm
+
+
+        mask_orient = df['orientation'] == orientation if orientation else True
+
+        if mode:
+            mask_mode = df['mode'] == mode
+        else:
+            mask_mode = True
+        
+        if field:
+            mask_field = df['const field'] == field
+        else:
+            mask_field = True
+        
+        if temperature:
+            mask_temp = df['const temp'] == temperature
+        else:
+            mask_temp = True
+
+
+        df_filtered = df[mask_field & mask_mode & mask_temp & mask_orient]
+        for index, row in df_filtered.iterrows():
+                if condition:
+                    if row['instance'].condition == condition:
+                        row['instance'].plot(ax=ax)
+                else:
+                    row['instance'].plot(ax=ax)
+
