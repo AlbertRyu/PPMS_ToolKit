@@ -91,3 +91,11 @@ def debye_model_extended(T, theta_D, B, D, scale=1.0):
             C.append(c)
 
     return np.array(C) + B * T + D
+
+
+def gauss_with_step(x, A, x0, sigma, cL, cR):
+    step = np.where(x < x0, cL, cR)
+    return A * np.exp(-((x - x0)**2) / (2 * sigma**2)) + step
+
+def gauss(x, A, x0, sigma, c):
+    return A * np.exp(-(x-x0)**2/(2*sigma**2)) + c
