@@ -12,5 +12,8 @@ class MainWindow(QMainWindow):
         self.center_widget = MyCenterWidget()
         self.setCentralWidget(self.center_widget)
         self.controller = DataController(self.center_widget)
+        self.menuBar()
+        self.statusBar()
+
 
 
