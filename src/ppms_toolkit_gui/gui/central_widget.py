@@ -2,7 +2,7 @@ from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
     )
-from .measurement_list_widget import MeasurementListWidget
+from .measurement_list_widget import TitledMeasurementListWidget
 
 
 class MyCenterWidget(QWidget):
@@ -10,8 +10,8 @@ class MyCenterWidget(QWidget):
         super().__init__()
 
         self.canvas = MplCanvas()
-        self.vsm_mt_measurement_list = MeasurementListWidget()
-        self.vsm_mh_measurement_list = MeasurementListWidget()
+        self.vsm_mt_measurement_list = TitledMeasurementListWidget('VSM - MT')
+        self.vsm_mh_measurement_list = TitledMeasurementListWidget('VSM - MH')
         vsm_list_layout = QVBoxLayout()
         vsm_list_layout.addWidget(self.vsm_mt_measurement_list)
         vsm_list_layout.addWidget(self.vsm_mh_measurement_list)

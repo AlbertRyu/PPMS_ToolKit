@@ -49,6 +49,10 @@ class TitledMeasurementListWidget(QWidget):
         root.addLayout(title_row)
         root.addWidget(self.list)
 
-    def add_measurement(self, m):
+    def add_vsm_measurement(self, m):
         return self.list.add_vsm_measurement(m)
+
+    def __getattr__(self, name):
+        return getattr(self.list, name)
+
 
