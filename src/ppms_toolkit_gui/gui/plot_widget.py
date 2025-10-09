@@ -30,8 +30,13 @@ class PlotWidget(QWidget):
         # End of Test Measurement
 
         self.button_add = QPushButton('Add Measurement')
+        self.button_add.setToolTip("Click to add a measurement from DAT file")
+
         self.button_plot = QPushButton('Plot')
+        self.button_plot.setToolTip("Click to Plot selected measurements")
+    
         self.if_chi = QCheckBox('Succeptiblity')
+        self.if_chi.setToolTip('Checked to plot suceptbity, otherwise moment')
 
         button_holder = QHBoxLayout()
         button_holder.addWidget(self.button_add)
