@@ -1,36 +1,26 @@
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
-    (QWidget, QListWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
-     QAbstractItemView)
+    (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
+    )
+from .measurement_list_widget import MeasurementListWidget
 
-from PySide6.QtCore import Qt
 
 class MyCenterWidget(QWidget):
     def __init__(self):
         super().__init__()
 
         self.canvas = MplCanvas()
-        self.measurement_list = QListWidget(self)
-        self.measurement_list.setSelectionMode(
-            QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.vsm_mt_measurement_list = MeasurementListWidget()
 
         # Add a default measurement for debug purpose.
         from ppms_toolkit.measurement import VSMMeasurement
-        from PySide6.QtWidgets import QListWidgetItem
-        from PySide6.QtCore import Qt
         m = VSMMeasurement(
             filepath='/Users/ryunosuke/Documents/Research/PPMS/PPMS_ToolKit/examples/test_data/VSM_TestData_4Cl_IP/MT_0P1T_FC.DAT',
             mode='MT',
             sample_orientation='In Plane',
             sample_mass=12
         )
-        item = QListWidgetItem(m.__repr__())
-        item.setData(Qt.ItemDataRole.UserRole, m)
-        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable 
-                      | Qt.ItemFlag.ItemIsSelectable 
-                      | Qt.ItemFlag.ItemIsEnabled)
-        item.setCheckState(Qt.CheckState.Unchecked)
-        self.measurement_list.addItem(item)
+        self.vsm_mt_measurement_list.add_vsm_measurement(m)
         # End of Test Measurement
 
         self.button_add = QPushButton('Add Measurement')
@@ -45,7 +35,7 @@ class MyCenterWidget(QWidget):
 
         file_control_layout = QVBoxLayout()
         file_control_layout.addWidget(self.label)
-        file_control_layout.addWidget(self.measurement_list)
+        file_control_layout.addWidget(self.vsm_mt_measurement_list)
         file_control_layout.addLayout(button_holder)
 
 

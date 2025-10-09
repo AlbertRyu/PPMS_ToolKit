@@ -2,7 +2,7 @@
 # Signal Control heißt das.
 #from ..gui.central_widget import MyCenterWidget
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
-from PySide6.QtWidgets import QDialog, QMessageBox, QListWidgetItem
+from PySide6.QtWidgets import QDialog, QMessageBox
 from PySide6.QtCore import Qt
 
 from typing import TYPE_CHECKING
@@ -35,20 +35,14 @@ class DataController:
             pay_load = dlg._return_payload()
             try:
                 m = VSMMeasurement(**pay_load)
-                item = QListWidgetItem(m.__repr__())
-                item.setData(Qt.ItemDataRole.UserRole, m)
-                self.view.measurement_list.addItem(item)
-                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable 
-                | Qt.ItemFlag.ItemIsSelectable 
-                | Qt.ItemFlag.ItemIsEnabled)
-                item.setCheckState(Qt.CheckState.Unchecked)
-                
+                self.view.vsm_mt_measurement_list.add_vsm_measurement(m)
+
             except Exception as e:
                 QMessageBox.critical(self.view, "Error", str(e))
         else:
             print('Canceled')
 
     def plot_measurement(self):
-        m : VSMMeasurement = self.view.measurement_list.currentItem().data(Qt.ItemDataRole.UserRole)
+        m : VSMMeasurement = self.view.vsm_mt_measurement_list.currentItem().data(Qt.ItemDataRole.UserRole)
         m.plot_magnetisation(ax=self.view.canvas.ax)
         self.view.canvas.canvas.draw()
