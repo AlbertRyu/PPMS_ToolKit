@@ -24,7 +24,8 @@ class MyCenterWidget(QWidget):
             sample_orientation='In Plane',
             sample_mass=12
         )
-        self.vsm_mt_measurement_list.add_vsm_measurement(m)
+        name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_field}Oe')
+        self.vsm_mt_measurement_list.add_vsm_measurement(name, m)
         # End of Test Measurement
 
         self.button_add = QPushButton('Add Measurement')

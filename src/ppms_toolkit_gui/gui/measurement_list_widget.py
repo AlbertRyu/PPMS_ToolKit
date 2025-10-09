@@ -21,8 +21,8 @@ class MeasurementListWidget(QListWidget):
         self.setSelectionMode(
             QAbstractItemView.SelectionMode.ExtendedSelection)
         
-    def add_vsm_measurement(self, m: VSMMeasurement):
-        item = QListWidgetItem(m.__repr__())
+    def add_vsm_measurement(self, name, m: VSMMeasurement):
+        item = QListWidgetItem(name)
         item.setData(Qt.ItemDataRole.UserRole, m)
         self.addItem(item)
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable 
@@ -49,9 +49,9 @@ class TitledMeasurementListWidget(QWidget):
         root.addLayout(title_row)
         root.addWidget(self.list)
 
-    def add_vsm_measurement(self, m):
-        return self.list.add_vsm_measurement(m)
-
+    def add_vsm_measurement(self, name, m):
+        return self.list.add_vsm_measurement(name, m)
+    
     def __getattr__(self, name):
         return getattr(self.list, name)
 
