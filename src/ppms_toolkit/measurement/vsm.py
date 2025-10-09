@@ -110,11 +110,11 @@ class VSMMeasurement(Measurement):
     
     def __repr__(self):
         if self.mode == 'MT':
-            return (f'{self.mode} exp on {self.sample_name} '
+            return (f'{self.mode} on {self.sample_name} '
                     f'with {self.sample_orientation} orientation '
                     f'at {self.const_field}Oe')
         else:
-            return (f'{self.mode} exp on {self.sample_name} '
+            return (f'{self.mode} on {self.sample_name} '
                     f'with {self.sample_orientation} orientation '
                     f'at {self.const_temp}K')
         
