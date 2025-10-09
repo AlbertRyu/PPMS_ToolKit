@@ -47,7 +47,6 @@ class PlotWidget(QWidget):
         file_control_layout.addLayout(vsm_list_layout)
         file_control_layout.addLayout(button_holder)
 
-
         main_layout = QHBoxLayout(self)
         main_layout.addLayout(file_control_layout)
         main_layout.addWidget(self.canvas)
