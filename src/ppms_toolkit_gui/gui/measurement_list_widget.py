@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import \
     (QListWidget, QListWidgetItem,
-     QAbstractItemView)
+     QAbstractItemView, QWidget, QLabel,
+     QHBoxLayout,QVBoxLayout)
 from PySide6.QtCore import Qt
 
 from typing import TYPE_CHECKING
@@ -13,8 +14,8 @@ if TYPE_CHECKING:
 
 
 class MeasurementListWidget(QListWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent= None):
+        super().__init__(parent)
 
         # Make the list multi selectable
         self.setSelectionMode(
@@ -28,3 +29,26 @@ class MeasurementListWidget(QListWidget):
         | Qt.ItemFlag.ItemIsSelectable 
         | Qt.ItemFlag.ItemIsEnabled)
         item.setCheckState(Qt.CheckState.Unchecked)
+
+class TitledMeasurementListWidget(QWidget):
+    def __init__(self, title, parent = None):
+        super().__init__(parent)
+
+        self._title = QLabel(title)
+
+        self.list: 'MeasurementListWidget' =  MeasurementListWidget(parent=self)
+
+        # 布局：标题行（可加按钮）+ 列表
+        title_row = QHBoxLayout()
+        title_row.addStretch()
+        title_row.addWidget(self._title)
+        title_row.addStretch()
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.addLayout(title_row)
+        root.addWidget(self.list)
+
+    def add_measurement(self, m):
+        return self.list.add_vsm_measurement(m)
+

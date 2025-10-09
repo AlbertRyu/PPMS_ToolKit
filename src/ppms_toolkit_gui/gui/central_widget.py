@@ -11,6 +11,10 @@ class MyCenterWidget(QWidget):
 
         self.canvas = MplCanvas()
         self.vsm_mt_measurement_list = MeasurementListWidget()
+        self.vsm_mh_measurement_list = MeasurementListWidget()
+        vsm_list_layout = QVBoxLayout()
+        vsm_list_layout.addWidget(self.vsm_mt_measurement_list)
+        vsm_list_layout.addWidget(self.vsm_mh_measurement_list)
 
         # Add a default measurement for debug purpose.
         from ppms_toolkit.measurement import VSMMeasurement
@@ -35,7 +39,7 @@ class MyCenterWidget(QWidget):
 
         file_control_layout = QVBoxLayout()
         file_control_layout.addWidget(self.label)
-        file_control_layout.addWidget(self.vsm_mt_measurement_list)
+        file_control_layout.addLayout(vsm_list_layout)
         file_control_layout.addLayout(button_holder)
 
 
