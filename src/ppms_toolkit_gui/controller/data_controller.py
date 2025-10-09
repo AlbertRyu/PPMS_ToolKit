@@ -2,18 +2,25 @@
 # Signal Control heißt das.
 #from ..gui.central_widget import MyCenterWidget
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QMessageBox, QListWidgetItem
+from PySide6.QtCore import Qt
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..gui.central_widget import MyCenterWidget
+
+from ppms_toolkit.measurement import VSMMeasurement
 
 class DataController:
-    def __init__(self, view) -> None:
+    def __init__(self, view: 'MyCenterWidget') -> None:
         self.view = view
 
         self._connect_signal()
         
 
     def _connect_signal(self):
-        #self.view = MyCenterWidget()
         self.view.button_add.clicked.connect(self.add_measurement)
+        self.view.button_plot.clicked.connect(self.plot_measurement)
 
 
     def test_function(self):
@@ -26,6 +33,16 @@ class DataController:
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
             pay_load = dlg._return_payload()
-            print(pay_load)
+            try:
+                m = VSMMeasurement(**pay_load)
+                item = QListWidgetItem(m.__repr__())
+                item.setData(Qt.ItemDataRole.UserRole, m)
+                self.view.measurement_list.addItem(item)
+                
+            except Exception as e:
+                QMessageBox.critical(self.view, "Error", str(e))
         else:
             print('Canceled')
+
+    def plot_measurement(self):
+        item = self.view.measurement_list

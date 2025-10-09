@@ -7,8 +7,7 @@ class MyCenterWidget(QWidget):
         super().__init__()
 
         self.canvas = MplCanvas()
-        self.file_list = QListWidget(self)
-        self.file_list.addItems(['item 1','Item 2','Item 3'])
+        self.measurement_list = QListWidget(self)
 
         self.button_add = QPushButton('Add Measurement')
         self.button_plot = QPushButton('Plot')
@@ -22,7 +21,7 @@ class MyCenterWidget(QWidget):
 
         file_control_layout = QVBoxLayout()
         file_control_layout.addWidget(self.label)
-        file_control_layout.addWidget(self.file_list)
+        file_control_layout.addWidget(self.measurement_list)
         file_control_layout.addLayout(button_holder)
 
 

@@ -1,4 +1,5 @@
-# This Dialog Pop up each time when I need to add a new measurement and ask infor from the USER.
+# This Dialog Pop up each time when I need to add a new 
+# measurement and ask infor from the USER.
 
 from PySide6.QtWidgets import (QDialog, QDialogButtonBox, 
     QFormLayout, QDoubleSpinBox, QLineEdit, QPushButton,
@@ -79,27 +80,26 @@ class NewMeasurementDialog(QDialog):
 
     def _on_accept(self):
         # Check if every value exist.
-        if not self.ori_btn_group.checkedButton():
-            QMessageBox.critical(self,'Warning','No orientaton chosed')
-            return
-        
-        if not self.mode_btn_group.checkedButton():
-            QMessageBox.critical(self,'Warning','No Mode choosed')
-            return
-                
         if not self.file_edit.text():
             QMessageBox.critical(self,'Warning','No dat file path')
             return
 
-        self.accept()
+        if not self.ori_btn_group.checkedButton():
+            QMessageBox.critical(self,'Warning','No orientaton chosed')
+            return
+    
+        if not self.mode_btn_group.checkedButton():
+            QMessageBox.critical(self,'Warning','No Mode choosed')
+            return
 
+        self.accept()
 
     def _return_payload(self):
         return {
         "mode": self.mode_btn_group.checkedButton().text(),
-        "orientation": self.ori_btn_group.checkedButton().text(),
-        "mass_mg": self.mass_spin.value(),
-        "file_path": self.file_edit.text().strip(),
+        "sample_orientation": self.ori_btn_group.checkedButton().text(),
+        "sample_mass": self.mass_spin.value(),
+        "filepath": self.file_edit.text().strip(),
         }
         
 
