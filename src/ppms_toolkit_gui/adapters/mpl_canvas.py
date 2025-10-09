@@ -10,6 +10,6 @@ class MplCanvas(QWidget):
         self.ax = self.figure.add_subplot(111)
         
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(self.canvas)
-
         

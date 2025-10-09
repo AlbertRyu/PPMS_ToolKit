@@ -39,7 +39,7 @@ class DataController:
                     name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_field}Oe')
                     self.view.vsm_mt_measurement_list.add_vsm_measurement(name, m)
                 else:
-                    name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_temp}Oe')
+                    name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_temp} K')
                     self.view.vsm_mh_measurement_list.add_vsm_measurement(name, m)
             except Exception as e:
                 QMessageBox.critical(self.view, "Error", str(e))
@@ -47,11 +47,15 @@ class DataController:
             print('Canceled')
 
     def plot_measurement(self):
+
         self.view.canvas.ax.clear()
         QList = self.view.vsm_mt_measurement_list
         for i in range(QList.count()):
             item = QList.item(i)
             if item.checkState() == Qt.CheckState.Checked:
                 m : VSMMeasurement = item.data(Qt.ItemDataRole.UserRole)
-                m.plot_magnetisation(ax=self.view.canvas.ax)
+                if self.view.if_chi.checkState()== Qt.CheckState.Checked:
+                    m.plot(ax=self.view.canvas.ax)
+                else:
+                    m.plot_magnetisation(ax=self.view.canvas.ax)
         self.view.canvas.canvas.draw()

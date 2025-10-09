@@ -1,6 +1,7 @@
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
-    (QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
+    (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
+     QCheckBox
     )
 from .measurement_list_widget import TitledMeasurementListWidget
 
@@ -30,16 +31,14 @@ class MyCenterWidget(QWidget):
 
         self.button_add = QPushButton('Add Measurement')
         self.button_plot = QPushButton('Plot')
-
-        self.label = QLabel('Measurement List')
+        self.if_chi = QCheckBox('Succeptiblity')
 
         button_holder = QHBoxLayout()
         button_holder.addWidget(self.button_add)
         button_holder.addWidget(self.button_plot)
-        
+        button_holder.addWidget(self.if_chi)
 
         file_control_layout = QVBoxLayout()
-        file_control_layout.addWidget(self.label)
         file_control_layout.addLayout(vsm_list_layout)
         file_control_layout.addLayout(button_holder)
 
