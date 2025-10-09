@@ -137,7 +137,7 @@ class VSMMeasurement(Measurement):
         ax.set_ylabel('Susceptibility (emu)')
         ax.set_title(f'{self.mode} - {self.sample_name}')
 
-        plt.legend()
+        ax.legend()
 
         return ax
     
@@ -160,7 +160,7 @@ class VSMMeasurement(Measurement):
         ax.set_ylabel('Moment (emu / gram)')
         ax.set_title(f'{self.mode} - {self.sample_name}')
 
-        plt.legend()
+        ax.legend()
 
         return ax
 
