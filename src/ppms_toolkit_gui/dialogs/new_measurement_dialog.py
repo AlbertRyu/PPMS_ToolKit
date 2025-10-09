@@ -16,9 +16,8 @@ class NewMeasurementDialog(QDialog):
         form = QFormLayout(self)
 
         # Fundamental infomation
-        self.mass_spin = QDoubleSpinBox(suffix=" mg")
+        self.mass_spin = QDoubleSpinBox(suffix=" mg", value=1)
         self.mass_spin.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
-
 
         # File Row 
         self.file_edit = QLineEdit(placeholderText='Select your file')
