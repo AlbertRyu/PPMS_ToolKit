@@ -9,6 +9,21 @@ class MyCenterWidget(QWidget):
         self.canvas = MplCanvas()
         self.measurement_list = QListWidget(self)
 
+        # Add a default measurement for debug purpose.
+        from ppms_toolkit.measurement import VSMMeasurement
+        from PySide6.QtWidgets import QListWidgetItem
+        from PySide6.QtCore import Qt
+        m = VSMMeasurement(
+            filepath='/Users/ryunosuke/Documents/Research/PPMS/PPMS_ToolKit/examples/test_data/VSM_TestData_4Cl_IP/MT_0P1T_FC.DAT',
+            mode='MT',
+            sample_orientation='In Plane',
+            sample_mass=12
+        )
+        item = QListWidgetItem(m.__repr__())
+        item.setData(Qt.ItemDataRole.UserRole, m)
+        self.measurement_list.addItem(item)
+        # End of Test Measurement
+
         self.button_add = QPushButton('Add Measurement')
         self.button_plot = QPushButton('Plot')
 

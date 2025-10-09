@@ -45,4 +45,6 @@ class DataController:
             print('Canceled')
 
     def plot_measurement(self):
-        item = self.view.measurement_list
+        m : VSMMeasurement = self.view.measurement_list.currentItem().data(Qt.ItemDataRole.UserRole)
+        m.plot_magnetisation(ax=self.view.canvas.ax)
+        self.view.canvas.canvas.draw()
