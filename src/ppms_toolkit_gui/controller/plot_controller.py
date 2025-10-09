@@ -1,18 +1,17 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
-#from ..gui.central_widget import MyCenterWidget
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox
 from PySide6.QtCore import Qt
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..gui.central_widget import MyCenterWidget
+    from ..gui.plot_widget import PlotWidget
 
 from ppms_toolkit.measurement import VSMMeasurement
 
-class DataController:
-    def __init__(self, view: 'MyCenterWidget') -> None:
+class PlotController:
+    def __init__(self, view: 'PlotWidget') -> None:
         self.view = view
 
         self._connect_signal()

@@ -6,9 +6,9 @@ from PySide6.QtWidgets import \
 from .measurement_list_widget import TitledMeasurementListWidget
 
 
-class MyCenterWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+class PlotWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.canvas = MplCanvas()
         self.vsm_mt_measurement_list = TitledMeasurementListWidget('VSM - MT')
