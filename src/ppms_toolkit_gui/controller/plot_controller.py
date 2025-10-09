@@ -55,6 +55,10 @@ class PlotController:
                 m : VSMMeasurement = item.data(Qt.ItemDataRole.UserRole)
                 if self.view.if_chi.checkState()== Qt.CheckState.Checked:
                     m.plot(ax=self.view.canvas.ax)
+                    #for line in self.view.canvas.ax.lines:
+                        #print(line)
                 else:
                     m.plot_magnetisation(ax=self.view.canvas.ax)
         self.view.canvas.canvas.draw()
+        self.view.toolbar.update()        # 让 toolbar 重新检测新的 artists
+        self.view.toolbar.push_current()  # 保存当前视图为新的“home”

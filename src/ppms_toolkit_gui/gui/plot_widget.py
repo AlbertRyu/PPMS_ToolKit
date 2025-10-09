@@ -1,8 +1,9 @@
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
-     QCheckBox
+     QCheckBox, QFrame
     )
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 from .measurement_list_widget import TitledMeasurementListWidget
 
 
@@ -11,6 +12,20 @@ class PlotWidget(QWidget):
         super().__init__(parent)
 
         self.canvas = MplCanvas()
+
+        toolbar = QHBoxLayout()
+        toolbar.setSpacing(8)
+
+        self.btn_zoom = QPushButton("Zoom")
+        self.btn_pan = QPushButton("Pan")
+        self.btn_reset = QPushButton("Reset")
+        self.btn_addline = QPushButton("Add Line")
+        self.btn_removeline = QPushButton("Remove Line")
+
+        for btn in [self.btn_zoom, self.btn_pan, self.btn_reset,
+                    self.btn_addline, self.btn_removeline]:
+            toolbar.addWidget(btn)
+
         self.vsm_mt_measurement_list = TitledMeasurementListWidget('VSM - MT')
         self.vsm_mh_measurement_list = TitledMeasurementListWidget('VSM - MH')
         vsm_list_layout = QVBoxLayout()
@@ -46,7 +61,24 @@ class PlotWidget(QWidget):
         file_control_layout = QVBoxLayout()
         file_control_layout.addLayout(vsm_list_layout)
         file_control_layout.addLayout(button_holder)
+        file_control_layout.setContentsMargins(10,10,10,10)
+
+        self.toolbar = NavigationToolbar(self.canvas.canvas, self)
+
+        plot_layout = QVBoxLayout()
+        plot_layout.addWidget(self.canvas.canvas)
+        plot_layout.addWidget(self.toolbar)
+        plot_layout.setContentsMargins(10,10,10,10)
+
+
+        vline = QFrame()
+        vline.setFrameShape(QFrame.VLine)
+        vline.setFrameShadow(QFrame.Sunken)
+        vline.setLineWidth(1)
+
+
 
         main_layout = QHBoxLayout(self)
         main_layout.addLayout(file_control_layout)
-        main_layout.addWidget(self.canvas)
+        main_layout.addWidget(vline)
+        main_layout.addLayout(plot_layout)

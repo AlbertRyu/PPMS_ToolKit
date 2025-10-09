@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QLocale, Qt
+from PySide6.QtCore import QLocale
 from .gui.main_window import MainWindow
 import sys
 
