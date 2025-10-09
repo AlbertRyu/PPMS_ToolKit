@@ -14,7 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter, detrend
 from scipy.optimize import curve_fit
-from scipy.interpolate import interp1d,PchipInterpolator,UnivariateSpline
+from scipy.interpolate import interp1d #,PchipInterpolator,UnivariateSpline
 from .utils import gauss_with_step, gauss
 
 if TYPE_CHECKING:
@@ -224,7 +224,7 @@ class VSMMeasurement(Measurement):
         chi = this_df['chi']
         Temp = this_df['Temperature (K)']
 
-        f_interp = interp1d(Temp, chi, kind='linear', bounds_error=False, fill_value="extrapolate")
+        f_interp = interp1d(Temp, chi, kind='linear', bounds_error=False, fill_value="extrapolate") # type: ignore[arg-type]
         # 生成等间距 T_new
         T_new = np.linspace(np.min(Temp), np.max(Temp), 2000)
         chi_resampled = f_interp(T_new)
