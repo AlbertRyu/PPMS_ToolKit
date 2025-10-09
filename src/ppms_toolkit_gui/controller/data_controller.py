@@ -38,6 +38,10 @@ class DataController:
                 item = QListWidgetItem(m.__repr__())
                 item.setData(Qt.ItemDataRole.UserRole, m)
                 self.view.measurement_list.addItem(item)
+                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable 
+                | Qt.ItemFlag.ItemIsSelectable 
+                | Qt.ItemFlag.ItemIsEnabled)
+                item.setCheckState(Qt.CheckState.Unchecked)
                 
             except Exception as e:
                 QMessageBox.critical(self.view, "Error", str(e))
