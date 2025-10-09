@@ -36,7 +36,7 @@ class NewMeasurementDialog(QDialog):
 
         self.mode = QGroupBox('Type of Exp')
         mode_MT = QRadioButton('MT')
-        mode_MH = QRadioButton('MH - Hysterisis')
+        mode_MH = QRadioButton('MH')
         mode_layout = QVBoxLayout(self.mode)
         mode_layout.addWidget(mode_MH)
         mode_layout.addWidget(mode_MT)
