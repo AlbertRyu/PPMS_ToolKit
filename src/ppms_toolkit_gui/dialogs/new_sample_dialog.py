@@ -1,6 +1,6 @@
 # This QDialog Pops up when user wants to add a Sample
 
-from PySide6.QtWidgets import QDialog, QFormLayout
+from PySide6.QtWidgets import QDialog, QFormLayout, QHBoxLayout, QRadioButton
 
 class NewSampleDialog(QDialog):
     def __init__(self, parent = None):
@@ -14,10 +14,16 @@ class NewSampleDialog(QDialog):
 
         # Name Line
 
-        
+
         # Select MT/MH and Orientation Row
-        self.select_row = QWidget()
-        select_layout =QHBoxLayout(self.select_row)
+        mode_layout = QHBoxLayout()
+        mode_mh = QRadioButton('MH')
+        mode_mt = QRadioButton('MT')
+        mode_layout.addWidget(mode_mh)
+        mode_layout.addWidget(mode_mt)
+        form_layout.addRow('Mode', mode_layout)
+
+        # Select the Orientation
 
 
 
