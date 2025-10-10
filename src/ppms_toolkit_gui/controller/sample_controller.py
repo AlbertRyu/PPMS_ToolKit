@@ -16,10 +16,12 @@ class SampleController:
         
 
     def _connect_signal(self):
-        pass
+        self.view.button_add.clicked.connect(self.add_sample)
+        self.view.button_add.clicked.connect(self.del_sample)
 
     def add_sample(self):
-        pass
+        print('add sample clicked')
 
     def del_sample(self):
+        print('del sample clicked.')
         pass
