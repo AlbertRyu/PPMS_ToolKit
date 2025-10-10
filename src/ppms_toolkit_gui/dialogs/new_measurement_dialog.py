@@ -39,7 +39,8 @@ class NewMeasurementDialog(QDialog):
         mode_layout = QVBoxLayout(self.mode)
         mode_layout.addWidget(mode_MH)
         mode_layout.addWidget(mode_MT)
-        self.mode_btn_group = QButtonGroup()
+        # Button Group seems like redundant, but is used later for checked checking.
+        self.mode_btn_group = QButtonGroup() 
         self.mode_btn_group.addButton(mode_MH)
         self.mode_btn_group.addButton(mode_MT)
 
