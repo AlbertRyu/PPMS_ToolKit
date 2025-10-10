@@ -1,9 +1,10 @@
 from PySide6.QtWidgets import QApplication, QDialog
-from PySide6.QtCore import QLocale
+from PySide6.QtCore import QLocale, QCoreApplication
+from PySide6.QtGui import QGuiApplication
+
 from .gui.main_window import MainWindow
 from .dialogs.project_dialog import ProjectDialog
 from infrastructure.db.db import LocalDB
-from PySide6.QtCore import QCoreApplication
 
 import sys
 
@@ -14,7 +15,15 @@ QCoreApplication.setApplicationName("GUI_Configuration")
 
 QLocale.setDefault(QLocale.Language.C) # uses '.' as a decimal point
 
-dlg = ProjectDialog()
+dlg = ProjectDialog(None)
+# This part is to make sure the window 
+# appear from the center of user's screen.
+screen = QGuiApplication.primaryScreen()
+geo = screen.availableGeometry()
+dlg_rect = dlg.rect()
+target_top_left = geo.center() - dlg_rect.center()
+dlg.move(target_top_left) 
+
 if dlg.exec() != QDialog.DialogCode.Accepted:
     sys.exit(0)
  
