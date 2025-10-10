@@ -7,7 +7,7 @@ class SampleTableModel(QAbstractTableModel):
     def __init__(self, samples):
         super().__init__()
         self.samples = samples
-        self.headers = ["ID", "Name", "Mass",  "Orientation", "Chemical", "Created", "Note"]
+        self.headers = ["ID", "Name", "Mass", "Chemical","Orientation", "Created", "Note"]
 
     # Self-defined API 
     def rowCount(self, parent = None):
