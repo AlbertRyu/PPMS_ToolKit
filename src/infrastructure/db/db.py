@@ -33,7 +33,7 @@ class LocalDB:
         name         TEXT    NOT NULL,
         mass         REAL    NOT NULL CHECK (mass >= 0),
         chemical     TEXT    NOT NULL,
-        orientation  TEXT    NOT NULL CHECK (orientation IN ('IP', 'OOP')),
+        orientation  TEXT    NOT NULL CHECK (orientation IN ('In Plane', 'Out of Plane')),
         notes        TEXT,
         created_at   TEXT    NOT NULL 
             );
