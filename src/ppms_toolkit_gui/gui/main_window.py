@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QMainWindow
 from .center_widget import MyCenterWidget
 from ..controller.plot_controller import PlotController 
+from PySide6.QtGui import QCloseEvent
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -25,5 +27,10 @@ class MainWindow(QMainWindow):
         self.menuBar()
         self.statusBar()
 
+    def closeEvent(self, event: QCloseEvent):
+        # 应用窗口关闭时关闭数据库
+        if self.db:
+            self.db.close()
+        super().closeEvent(event)
 
 

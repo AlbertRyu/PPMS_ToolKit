@@ -3,7 +3,7 @@ from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
      QCheckBox, QFrame
     )
-from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar
 from .measurement_list_widget import TitledMeasurementListWidget
 
 
@@ -72,10 +72,9 @@ class PlotWidget(QWidget):
 
 
         vline = QFrame()
-        vline.setFrameShape(QFrame.VLine)
-        vline.setFrameShadow(QFrame.Sunken)
+        vline.setFrameShape(QFrame.Shape.VLine)
+        vline.setFrameShadow(QFrame.Shadow.Sunken)
         vline.setLineWidth(1)
-
 
 
         main_layout = QHBoxLayout(self)

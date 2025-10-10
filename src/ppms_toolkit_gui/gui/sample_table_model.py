@@ -1,0 +1,34 @@
+# This define what the sample model should be like and how 
+# it reads data from the sqlite database.
+
+from PySide6.QtCore import QAbstractTableModel, Qt
+
+class SampleTableModel(QAbstractTableModel):
+    def __init__(self, samples):
+        super().__init__()
+        self.samples = samples
+        self.headers = ["ID", "Name", "Chemical", "Note", "Created"]
+
+    # Self-defined API 
+    def rowCount(self, parent = None):
+        return len(self.samples)
+    
+    def columnCount(self, parent=None):
+        return len(self.headers)
+
+    def data(self, index, role: int = Qt.ItemDataRole.DisplayRole):
+        sample = self.samples[index.row()]
+        col = index.column()
+        if role == Qt.ItemDataRole.DisplayRole:
+            return [
+                sample.id,
+                sample.name,
+                sample.chemical,
+                sample.notes,
+                sample.created_at
+            ][col]
+        else:
+            return None
+    
+
+
