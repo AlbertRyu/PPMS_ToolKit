@@ -20,7 +20,7 @@ class LocalDB:
         self.project_root = Path(project_root)
         self.db_path = self.project_root / "db.sqlite3"
         self.project_root.mkdir(parents=True, exist_ok=True)
-        self.con = sqlite3.connect(self.db_path)
+        self.con = sqlite3.connect(str(self.db_path))
         self.con.execute("PRAGMA foreign_keys = ON;")
         self.con.execute("PRAGMA journal_mode = WAL;")
         self._ensure_schema()

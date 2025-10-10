@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..gui.sample_widget import SampleTabWidget
 
+from ..dialogs.new_sample_dialog import NewSampleDialog
+
 #from ppms_toolkit.sample import Sample 
 
 class SampleController:
@@ -17,9 +19,11 @@ class SampleController:
 
     def _connect_signal(self):
         self.view.button_add.clicked.connect(self.add_sample)
-        self.view.button_add.clicked.connect(self.del_sample)
+        self.view.button_del.clicked.connect(self.del_sample)
 
     def add_sample(self):
+        dlg = NewSampleDialog()
+        dlg.exec()
         print('add sample clicked')
 
     def del_sample(self):
