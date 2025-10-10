@@ -3,13 +3,14 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
-from datetime import datetime
 
 @dataclass(frozen=True)
 class SampleDTO:
-    id: int
+    id: int | None
     name: str
-    code: str | None
+    mass : float
+    chemical: str
+    orientation: str
     notes: str | None
     created_at: str
 
@@ -27,28 +28,37 @@ class LocalDB:
     def _ensure_schema(self):
         """若无表则自动创建（幂等）。"""
         self.con.executescript("""
-        CREATE TABLE IF NOT EXISTS sample (
-          id          INTEGER PRIMARY KEY,
-          name        TEXT NOT NULL UNIQUE,
-          code        TEXT,
-          notes       TEXT,
-          created_at  TEXT NOT NULL
-        );
-        CREATE INDEX IF NOT EXISTS idx_sample_created ON sample(created_at);
+        CREATE TABLE IF NOT EXISTS samples (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        name         TEXT    NOT NULL,
+        mass         REAL    NOT NULL CHECK (mass >= 0),
+        chemical     TEXT    NOT NULL,
+        orientation  TEXT    NOT NULL CHECK (orientation IN ('IP', 'OOP')),
+        notes        TEXT,
+        created_at   TEXT    NOT NULL 
+            );
+        CREATE INDEX IF NOT EXISTS idx_sample_created ON samples(created_at);
         """)
         self.con.commit()
 
-    def add_sample(self, name: str, code: str = "", notes: str = ""):
+    def add_sample(self, 
+                   name: str,
+                   mass: float,
+                   chemical: str,
+                   orientation :str,
+                   create_at: str,
+                   notes: str = "",
+                   ):
         cur = self.con.execute(
-            "INSERT INTO sample(name, code, notes, created_at) VALUES(?,?,?,?)",
-            (name, code, notes, datetime.now().isoformat(timespec="seconds")),
+            "INSERT INTO samples(name, mass, chemical, orientation, created_at, notes) VALUES(?,?,?,?,?,?)",
+            (name, mass, chemical, orientation, create_at, notes),
         )
         self.con.commit()
         return cur.lastrowid
 
     def list_samples(self) -> list[SampleDTO]:
         rows = self.con.execute(
-            "SELECT id, name, code, notes, created_at FROM sample ORDER BY created_at DESC"
+            "SELECT id, name, mass, chemical, orientation, created_at, notes FROM samples ORDER BY created_at DESC"
         ).fetchall()
         return [SampleDTO(*r) for r in rows]
 
