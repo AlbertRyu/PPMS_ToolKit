@@ -1,31 +1,21 @@
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QDialog
 from PySide6.QtCore import QLocale
 from .gui.main_window import MainWindow
+from .dialogs.project_dialog import ProjectDialog
 from infrastructure.db.db import LocalDB
+
 import sys
 
 app = QApplication(sys.argv)
 
 QLocale.setDefault(QLocale.Language.C) # uses '.' as a decimal point
 
-
-folder = QFileDialog.getExistingDirectory(
-    None, "Select your working directory.", '',
-    QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks |
-    QFileDialog.Option.DontUseNativeDialog
-
-)
-if not folder:
-    QMessageBox.critical(None, 
-                         "Fatal Error", 
-                         "You have to have a working directory.",
-                         buttons= QMessageBox.StandardButton.Ok)
+dlg = ProjectDialog()
+if dlg.exec() != QDialog.DialogCode.Accepted:
     sys.exit(0)
-
+ 
+folder = dlg.get_folder()
 db = LocalDB(folder)
-
-
-
 
 win = MainWindow(db)
 win.show()
