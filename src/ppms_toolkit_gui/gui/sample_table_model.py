@@ -7,7 +7,7 @@ class SampleTableModel(QAbstractTableModel):
     def __init__(self, samples):
         super().__init__()
         self.samples = samples
-        self.headers = ["ID", "Name", "Mass",  "Orientation", "Chemical", "Note", "Created"]
+        self.headers = ["ID", "Name", "Mass",  "Orientation", "Chemical", "Created", "Note"]
 
     # Self-defined API 
     def rowCount(self, parent = None):
@@ -31,6 +31,13 @@ class SampleTableModel(QAbstractTableModel):
             ][col]
         else:
             return None
+
+    
+    def headerData(self, section, orientation, role: int = Qt.ItemDataRole.DisplayRole):
+        # Set how the headers are shown.
+        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
+            return self.headers [section]
+        return super().headerData(section, orientation, role)
     
 
 
