@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         self.center_widget.setContentsMargins(0,30,0,0)
         self.setCentralWidget(self.center_widget)
         self.plot_controller = PlotController(self.center_widget.plot_tab)
-        self.sample_controller = SampleController(self.center_widget.sample_tab)
+        self.sample_controller = SampleController(self.db, self.center_widget.sample_tab)
 
 
         self.menuBar()

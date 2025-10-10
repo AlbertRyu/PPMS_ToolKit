@@ -49,18 +49,44 @@ class LocalDB:
                    create_at: str,
                    notes: str = "",
                    ):
+        cur = self.con.cursor()
+
+        cur.execute("""
+        SELECT id, name FROM samples
+        WHERE chemical = ? AND ABS(mass - ?) < 1e-6
+        """, (chemical, mass))
+        dup = cur.fetchall()
+        if dup:
+            dup_names = [d[1] for d in dup]
+            print(f"⚠️ Possible duplicate samples: {dup_names}")
+            return False
+
         cur = self.con.execute(
-            "INSERT INTO samples(name, mass, chemical, orientation, created_at, notes) VALUES(?,?,?,?,?,?)",
+            "INSERT INTO samples(name, mass, chemical, orientation, created_at, notes) VALUES(?,?,?,?,?,?);",
             (name, mass, chemical, orientation, create_at, notes),
         )
         self.con.commit()
         return cur.lastrowid
+
+    def fetch_all_distinct_chemical(self):
+        cur = self.con.cursor()
+        cur.execute(
+            '''
+            SELECT DISTINCT TRIM(chemical)
+            FROM samples
+            WHERE chemical IS NOT NULL
+            AND TRIM(chemical) <> ''
+            ORDER BY LOWER(chemical);
+            '''
+        )
+        rows = cur.fetchall()
+        return [rows[r][0] for r in range(len(rows))]
 
     def list_samples(self) -> list[SampleDTO]:
         rows = self.con.execute(
             "SELECT id, name, mass, chemical, orientation, created_at, notes FROM samples ORDER BY created_at DESC"
         ).fetchall()
         return [SampleDTO(*r) for r in rows]
-
+    
     def close(self):
         self.con.close()

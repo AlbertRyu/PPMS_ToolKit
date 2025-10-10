@@ -6,14 +6,16 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..gui.sample_widget import SampleTabWidget
+    from infrastructure.db.db import LocalDB
 
-from ..dialogs.new_sample_dialog import NewSampleDialog
+from ..dialogs.new_sample_dialog import NewSampleDialog, QDialog
 
 #from ppms_toolkit.sample import Sample 
 
 class SampleController:
-    def __init__(self, view: 'SampleTabWidget') -> None:
+    def __init__(self, db: 'LocalDB', view: 'SampleTabWidget') -> None:
         self.view = view
+        self.db = db
         self._connect_signal()
         
 
@@ -22,9 +24,20 @@ class SampleController:
         self.view.button_del.clicked.connect(self.del_sample)
 
     def add_sample(self):
-        dlg = NewSampleDialog()
-        dlg.exec()
-        print('add sample clicked')
+        dlg = NewSampleDialog(self.db)
+
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            print('Accepted')
+            pay_load = dlg._return_payload()
+            self.db.add_sample(
+                name=pay_load['name'],
+                mass=pay_load['sample_mass'],
+                chemical=pay_load['chemical'],
+                orientation=pay_load['sample_orientation'],
+                create_at=pay_load['create_date']
+            )
+        else:
+            print('Canceled')
 
     def del_sample(self):
         print('del sample clicked.')
