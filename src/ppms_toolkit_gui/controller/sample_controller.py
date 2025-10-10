@@ -5,12 +5,12 @@
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..gui.sample_widget import SampleTableWidget
+    from ..gui.sample_widget import SampleTabWidget
 
 #from ppms_toolkit.sample import Sample 
 
 class SampleController:
-    def __init__(self, view: 'SampleTableWidget') -> None:
+    def __init__(self, view: 'SampleTabWidget') -> None:
         self.view = view
         self._connect_signal()
         
