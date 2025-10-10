@@ -32,12 +32,15 @@ class SampleTableModel(QAbstractTableModel):
         else:
             return None
 
-    
     def headerData(self, section, orientation, role: int = Qt.ItemDataRole.DisplayRole):
         # Set how the headers are shown.
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             return self.headers [section]
         return super().headerData(section, orientation, role)
     
+    def refresh_samples(self, new_samples):
+        self.beginResetModel()  # 通知视图“我要换数据了”
+        self.samples = new_samples
+        self.endResetModel()    # 通知视图“数据换完了，重画吧”
 
 

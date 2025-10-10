@@ -36,6 +36,9 @@ class SampleController:
                 orientation=pay_load['sample_orientation'],
                 create_at=pay_load['create_date']
             )
+            print('Sample Added')
+            new_samples = self.db.list_samples()
+            self.view.model.refresh_samples(new_samples)
         else:
             print('Canceled')
 
