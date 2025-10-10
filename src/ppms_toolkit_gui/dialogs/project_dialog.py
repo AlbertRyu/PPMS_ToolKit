@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QPushButton, QLineEdit, QSizePolicy, QFileDialog,
     QMessageBox
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSettings
 from PySide6.QtGui import QFont
 
 from pathlib import Path
@@ -13,6 +13,10 @@ from pathlib import Path
 class ProjectDialog(QDialog):
     def __init__(self, parent = None):
         super().__init__(parent)
+
+        self.settings = QSettings()
+        last_dir = str(self.settings.value("last_dir", ""))
+
 
         self.setWindowTitle('Welcome to PPMS Toolkit')
         self.setContentsMargins(20, 10, 20, 10)
@@ -28,6 +32,10 @@ class ProjectDialog(QDialog):
 
         file_row = QHBoxLayout()
         self.file_edit = QLineEdit(placeholderText='Select your folder')
+        
+        if last_dir and Path(last_dir).is_dir():
+            self.file_edit.setText(last_dir)  # 启动时填充
+
         self.file_edit.setReadOnly(True)
         self.file_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.browse_btn = QPushButton('Browse')
@@ -48,13 +56,14 @@ class ProjectDialog(QDialog):
 
 
     def _on_browse(self):
-        start_dir = self.file_edit.text() or str(Path.home())
+        last_dir = self.settings.value("last_dir", "") or (Path.home())
         folder = QFileDialog.getExistingDirectory(
-            None, "Select your working directory.", start_dir,
+            None, "Select your working directory.", str(last_dir),
             QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks |
             QFileDialog.Option.DontUseNativeDialog
         )
         if folder:
+            self.settings.setValue("last_dir", folder)
             self.file_edit.setText(folder)
 
     def _on_confirm(self):
