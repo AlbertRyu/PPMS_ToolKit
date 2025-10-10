@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMainWindow
 from .center_widget import MyCenterWidget
 from ..controller.plot_controller import PlotController 
+from ..controller.sample_controller import SampleController
 from PySide6.QtGui import QCloseEvent
 
 
@@ -23,7 +24,10 @@ class MainWindow(QMainWindow):
         self.center_widget = MyCenterWidget(self.db)
         self.center_widget.setContentsMargins(0,30,0,0)
         self.setCentralWidget(self.center_widget)
-        self.controller = PlotController(self.center_widget.plot_widget)
+        self.plot_controller = PlotController(self.center_widget.plot_tab)
+        self.sample_controller = SampleController(self.center_widget.sample_tab)
+
+
         self.menuBar()
         self.statusBar()
 

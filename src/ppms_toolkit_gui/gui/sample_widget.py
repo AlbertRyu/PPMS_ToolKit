@@ -1,10 +1,13 @@
 '''GUI for the sample tab'''
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QTableView
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QLineEdit, QTableView, QHBoxLayout,
+    QPushButton
+)
 from .sample_table_model import SampleTableModel
 
 from infrastructure.db.db import LocalDB
 
-class SampleTableWidget(QWidget):
+class SampleTabWidget(QWidget):
     def __init__(self, db: 'LocalDB'):
         super().__init__()
         self.db = db
@@ -21,6 +24,10 @@ class SampleTableWidget(QWidget):
         self.table = QTableView()
         self.model = SampleTableModel(samples=samples)
         self.table.setModel(self.model)
+
+        # Add button bar
+        button_holder = QHBoxLayout()
+        button_add = QPushButton()
 
         layout.addWidget(self.search)
         layout.addWidget(self.table)
