@@ -11,8 +11,8 @@ class SampleDTO:
     mass : float
     chemical: str
     orientation: str
-    notes: str | None
     created_at: str
+    notes: str | None
 
 class LocalDB:
     """最小可用 SQLite 封装，用于保存/读取 Sample 列表。"""

@@ -30,9 +30,11 @@ class SampleTabWidget(QWidget):
         button_holder.setSpacing(10)
         self.button_add = QPushButton('Add Sample')
         self.button_del = QPushButton('Delete Sample')
+        self.button_edit = QPushButton('Edit Sample')
         button_holder.addStretch()
         button_holder.addWidget(self.button_add)
         button_holder.addWidget(self.button_del)
+        button_holder.addWidget(self.button_edit)
         button_holder.addStretch()
 
         layout.addWidget(self.search)
