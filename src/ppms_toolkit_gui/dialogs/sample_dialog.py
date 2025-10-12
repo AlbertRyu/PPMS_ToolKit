@@ -1,4 +1,4 @@
-# This QDialog Pops up when user wants to add a Sample
+# This QDialog Pops up when user wants to add or edit Sample
 
 from PySide6.QtWidgets import (
     QDialog, QFormLayout, QHBoxLayout, QRadioButton, QButtonGroup,
@@ -10,15 +10,21 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from infrastructure.db.db import LocalDB
 
-class NewSampleDialog(QDialog):
-    def __init__(self, db: 'LocalDB', parent = None):
+class SampleDialog(QDialog):
+    def __init__(self, db: 'LocalDB', sample: dict | None = None, parent = None):
         super().__init__(parent)
+        self.db = db
+        self._build_ui()
+        self.sample = sample
+        if self.sample:
+            self._prefill(self.sample)
+            self.setWindowTitle('Edit Sample')
+        else:
+            self.setWindowTitle('Sample Dialog')
 
-        self.setWindowTitle('New Sample Dialog')
-
+    def _build_ui(self):
+        
         form_layout = QFormLayout(self)
-
-        # ["ID", "Name", "Mass", "Chemical","Orientation", "Created", "Note"]
 
         # Name Row
         self.name_edit = QLineEdit(placeholderText="Sample Name")
@@ -30,17 +36,17 @@ class NewSampleDialog(QDialog):
         # Chemical Row
         self.chemical_edit = QComboBox(editable=True)
         self.chemical_edit.addItem('')
-        self.chemical_edit.addItems(db.fetch_all_distinct_chemical())
+        self.chemical_edit.addItems(self.db.fetch_all_distinct_chemical())
 
         # Select the Orientation
         ori_layout = QHBoxLayout()
-        ori_OOP = QRadioButton('Out of Plane')
-        ori_IP = QRadioButton('In Plane')
-        ori_layout.addWidget(ori_IP)
-        ori_layout.addWidget(ori_OOP)
+        self.ori_OOP = QRadioButton('Out of Plane')
+        self.ori_IP = QRadioButton('In Plane')
+        ori_layout.addWidget(self.ori_IP)
+        ori_layout.addWidget(self.ori_OOP)
         self.ori_btn_group = QButtonGroup()
-        self.ori_btn_group.addButton(ori_OOP)
-        self.ori_btn_group.addButton(ori_IP)
+        self.ori_btn_group.addButton(self.ori_OOP)
+        self.ori_btn_group.addButton(self.ori_IP)
 
         # Created time row.
         self.date_edit = QDateEdit()
@@ -66,6 +72,20 @@ class NewSampleDialog(QDialog):
         form_layout.addRow('Note', self.notes_edit)
         form_layout.addRow(buttons)
 
+    def _prefill(self, sample: dict):
+        self.name_edit.setText(sample.get("name", ""))
+        self.mass_spin.setValue(sample.get("mass", 1))
+        self.chemical_edit.setCurrentText(sample.get("chemical",""))
+
+        ori = sample.get("orientation")
+        if ori == "In Plane":
+            self.ori_IP.setChecked(True)
+        elif ori == "Out of Plane":
+            self.ori_OOP.setChecked(True)
+
+        self.date_edit.setDate(QDate.fromString(sample.get("created_at",""))) 
+
+
     def _on_accept(self):
         # Check if every value exist.
         if not self.name_edit.text():
@@ -89,9 +109,9 @@ class NewSampleDialog(QDialog):
     def _return_payload(self):
         return {
         "name": self.name_edit.text(),
-        "sample_mass": self.mass_spin.value(),
+        "mass": self.mass_spin.value(),
         "chemical": self.chemical_edit.currentText(),
-        "sample_orientation": self.ori_btn_group.checkedButton().text(),
-        "create_date": self.date_edit.text(),
+        "orientation": self.ori_btn_group.checkedButton().text(),
+        "created_at": self.date_edit.text(),
         "note":self.notes_edit.toPlainText()
         }
