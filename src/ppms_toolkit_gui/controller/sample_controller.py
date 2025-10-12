@@ -55,21 +55,15 @@ class SampleController:
             print('Canceled')
 
     def edit_sample(self):
-        dlg = SampleDialog(self.db)
+        sample = self.get_selected_sample()
+        dlg = SampleDialog(self.db, sample)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            print('Accepted')
             pay_load = dlg._return_payload()
-            self.db.add_sample(
-                name=pay_load['name'],
-                mass=pay_load['mass'],
-                chemical=pay_load['chemical'],
-                orientation=pay_load['orientation'],
-                create_at=pay_load['created_at']
-            )
-            print('Sample Added')
+            '''
             new_samples = self.db.list_samples()
             self.view.model.refresh_samples(new_samples)
+            '''
         else:
             print('Canceled')
 
