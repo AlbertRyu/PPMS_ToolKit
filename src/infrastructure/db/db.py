@@ -93,6 +93,16 @@ class LocalDB:
         rc = cur.rowcount # How many lines been affect by this cur.
         cur.close()
         return rc  # should return 1
+    
+    def delete_sample(self, sample:SampleDTO) -> int:
+        if sample is None:
+            return 0
+        cur = self.con.cursor()
+        cur.execute("DELETE FROM samples WHERE id = ?", (sample.id,))
+        self.con.commit()
+        rc = cur.rowcount
+        cur.close()
+        return rc # expect 1
 
 
     def fetch_all_distinct_chemical(self):

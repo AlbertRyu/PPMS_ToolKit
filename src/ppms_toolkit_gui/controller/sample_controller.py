@@ -4,12 +4,14 @@
 #from PySide6.QtCore import Qt
 
 from typing import TYPE_CHECKING
+
+from infrastructure.db.db import SampleDTO
 if TYPE_CHECKING:
     from ..gui.sample_widget import SampleTabWidget
     from infrastructure.db.db import LocalDB
 
 from ..dialogs.sample_dialog import SampleDialog
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QMessageBox
 
 #from ppms_toolkit.sample import Sample 
 
@@ -25,7 +27,7 @@ class SampleController:
         self.view.button_del.clicked.connect(self.del_sample)
         self.view.button_edit.clicked.connect(self.edit_sample)
 
-    def get_selected_sample(self):
+    def get_selected_sample(self) -> SampleDTO | None:
         selection = self.view.table.selectionModel()
         if not selection or not selection.currentIndex().isValid():
             return None
@@ -43,9 +45,7 @@ class SampleController:
             new_sample = dlg.get_sample()
             self.db.add_sample(new_sample)
             print('Sample Added')
-
-            new_samples = self.db.list_samples()
-            self.view.model.refresh_samples(new_samples)
+            self.refresh_table()
         else:
             print('Canceled')
 
@@ -56,14 +56,28 @@ class SampleController:
         if dlg.exec() == QDialog.DialogCode.Accepted:
             editted_sample = dlg.get_sample()
             self.db.update_sampe(editted_sample)
-
-            new_samples = self.db.list_samples()
-            self.view.model.refresh_samples(new_samples)
-
+            self.refresh_table()
         else:
             print('Canceled')
 
 
     def del_sample(self):
-        print('del sample clicked.')
-        pass
+        sample = self.get_selected_sample()
+
+        if sample is None:
+            QMessageBox.information(self.view, "Delete", "please first choose a line")
+            return 
+
+        msg  = f"Confirm you want delete {sample.name}（mass={sample.mass}？This is irreversible"
+        if QMessageBox.question(self.view, "Cofirm", msg,
+                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                            QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
+            return
+        
+        self.db.delete_sample(sample)
+        self.refresh_table()
+
+    def refresh_table(self):
+        new_samples = self.db.list_samples()
+        self.view.model.refresh_samples(new_samples)
+
