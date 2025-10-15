@@ -4,6 +4,8 @@ from PySide6.QtWidgets import (
     QPushButton, QAbstractItemView, QHeaderView
 )
 from ..models.sample_table_model import SampleTableModel
+from ..controller.header_filter_controller import HeaderFilterController
+from ..proxy.multi_value_filter import MultiValueFilterProxy
 
 from infrastructure.db.db import LocalDB
 
@@ -11,19 +13,22 @@ class SampleTabWidget(QWidget):
     def __init__(self, db: 'LocalDB'):
         super().__init__()
         self.db = db
-
         layout = QVBoxLayout(self)
 
-        #Read the samples from db
-        samples = db.list_samples()
+
+        samples = db.list_samples() #Read the samples from db
 
         # Add a search box
         self.search = QLineEdit(placeholderText='Search Sample Name or Comment')
         
         # Add a table
         self.table = QTableView()
+
         self.model = SampleTableModel(samples=samples)
-        self.table.setModel(self.model)
+        proxy = MultiValueFilterProxy()
+        proxy.setSourceModel(self.model)
+        self.filter_controller = HeaderFilterController(self.table, proxy)
+        self.table.setModel(proxy)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table.resizeColumnsToContents()
         header = self.table.horizontalHeader()
