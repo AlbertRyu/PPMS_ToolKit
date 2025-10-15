@@ -1,4 +1,5 @@
 # This QDialog Pops up when user wants to add or edit Sample
+from __future__ import annotations
 
 from PySide6.QtWidgets import (
     QDialog, QFormLayout, QHBoxLayout, QRadioButton, QButtonGroup,
@@ -7,11 +8,12 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QDate
 from typing import TYPE_CHECKING
+from infrastructure.db.db import SampleDTO
 if TYPE_CHECKING:
     from infrastructure.db.db import LocalDB
 
 class SampleDialog(QDialog):
-    def __init__(self, db: 'LocalDB', sample: dict | None = None, parent = None):
+    def __init__(self, db: LocalDB, sample: SampleDTO | None = None, parent = None):
         super().__init__(parent)
         self.db = db
         self._build_ui()
@@ -72,20 +74,19 @@ class SampleDialog(QDialog):
         form_layout.addRow('Note', self.notes_edit)
         form_layout.addRow(buttons)
 
-    def _prefill(self, sample: dict):
-        self.name_edit.setText(sample.get("name", ""))
-        self.mass_spin.setValue(sample.get("mass", 1))
-        self.chemical_edit.setCurrentText(sample.get("chemical",""))
+    def _prefill(self, sample: SampleDTO):
+        self.name_edit.setText(sample.name)
+        self.mass_spin.setValue(sample.mass)
+        self.chemical_edit.setCurrentText(sample.chemical)
 
-        ori = sample.get("orientation")
+        ori = sample.orientation
         if ori == "In Plane":
             self.ori_IP.setChecked(True)
         elif ori == "Out of Plane":
             self.ori_OOP.setChecked(True)
 
-        self.date_edit.setDate(QDate.fromString(sample.get("created_at",""))) 
-
-
+        self.date_edit.setDate(QDate.fromString(sample.created_at))
+        self.notes_edit.setPlainText(sample.notes or '')
     def _on_accept(self):
         # Check if every value exist.
         if not self.name_edit.text():
@@ -106,12 +107,14 @@ class SampleDialog(QDialog):
 
         self.accept()
     
-    def _return_payload(self):
-        return {
-        "name": self.name_edit.text(),
-        "mass": self.mass_spin.value(),
-        "chemical": self.chemical_edit.currentText(),
-        "orientation": self.ori_btn_group.checkedButton().text(),
-        "created_at": self.date_edit.text(),
-        "note":self.notes_edit.toPlainText()
-        }
+    def get_sample(self) -> SampleDTO:
+        return SampleDTO(
+            id = self.sample.id if self.sample else None, # Return the sample_id in edit mode
+            name = self.name_edit.text(),
+            mass=self.mass_spin.value(),
+            chemical=self.chemical_edit.currentText(),
+            orientation=self.ori_btn_group.checkedButton().text(),
+            created_at=self.date_edit.text(),
+            notes=self.notes_edit.toPlainText()
+        )
+

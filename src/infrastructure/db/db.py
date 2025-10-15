@@ -1,8 +1,11 @@
 # src/yourapp_infra_local/db.py
 from __future__ import annotations
+from multiprocessing import Value
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
+
+from ppms_toolkit.sample import Sample
 
 @dataclass(frozen=True)
 class SampleDTO:
@@ -41,20 +44,13 @@ class LocalDB:
         """)
         self.con.commit()
 
-    def add_sample(self, 
-                   name: str,
-                   mass: float,
-                   chemical: str,
-                   orientation :str,
-                   create_at: str,
-                   notes: str = "",
-                   ):
+    def add_sample(self, sample : SampleDTO):
         cur = self.con.cursor()
 
         cur.execute("""
         SELECT id, name FROM samples
         WHERE chemical = ? AND ABS(mass - ?) < 1e-6
-        """, (chemical, mass))
+        """, (sample.chemical, sample.mass))
         dup = cur.fetchall()
         if dup:
             dup_names = [d[1] for d in dup]
@@ -63,10 +59,41 @@ class LocalDB:
 
         cur = self.con.execute(
             "INSERT INTO samples(name, mass, chemical, orientation, created_at, notes) VALUES(?,?,?,?,?,?);",
-            (name, mass, chemical, orientation, create_at, notes),
+            (sample.name, sample.mass, sample.chemical, sample.orientation, sample.created_at, sample.notes),
         )
         self.con.commit()
         return cur.lastrowid
+    
+    def update_sampe(self, sample: SampleDTO):
+        if sample.id is None:
+            raise ValueError("update samples needs sample ID")
+        sql = """
+            UPDATE samples
+            SET
+                name        = ?,
+                mass        = ?,
+                chemical    = ?,
+                orientation = ?,
+                created_at  = ?,   -- 若不希望改动，传旧值即可
+                notes       = ?
+            WHERE id = ?
+            """
+        params = (
+            sample.name,
+            sample.mass,
+            sample.chemical,
+            sample.orientation,
+            sample.created_at,
+            sample.notes,
+            sample.id,
+        )
+        cur = self.con.cursor()
+        cur.execute(sql, params)
+        self.con.commit()
+        rc = cur.rowcount # How many lines been affect by this cur.
+        cur.close()
+        return rc  # should return 1
+
 
     def fetch_all_distinct_chemical(self):
         cur = self.con.cursor()

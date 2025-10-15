@@ -23,7 +23,7 @@ class SampleController:
     def _connect_signal(self):
         self.view.button_add.clicked.connect(self.add_sample)
         self.view.button_del.clicked.connect(self.del_sample)
-        self.view.button_edit.clicked.connect(self.get_selected_sample)
+        self.view.button_edit.clicked.connect(self.edit_sample)
 
     def get_selected_sample(self):
         selection = self.view.table.selectionModel()
@@ -33,22 +33,17 @@ class SampleController:
         row = selection.currentIndex().row()
         samples = getattr(self.view.model, "samples", [])
         if 0  <= row < len(samples):
-            print(samples[0])
+            return samples[row]
         
     def add_sample(self):
         dlg = SampleDialog(self.db)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
-            pay_load = dlg._return_payload()
-            self.db.add_sample(
-                name=pay_load['name'],
-                mass=pay_load['mass'],
-                chemical=pay_load['chemical'],
-                orientation=pay_load['orientation'],
-                create_at=pay_load['created_at']
-            )
+            new_sample = dlg.get_sample()
+            self.db.add_sample(new_sample)
             print('Sample Added')
+
             new_samples = self.db.list_samples()
             self.view.model.refresh_samples(new_samples)
         else:
@@ -59,11 +54,12 @@ class SampleController:
         dlg = SampleDialog(self.db, sample)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            pay_load = dlg._return_payload()
-            '''
+            editted_sample = dlg.get_sample()
+            self.db.update_sampe(editted_sample)
+
             new_samples = self.db.list_samples()
             self.view.model.refresh_samples(new_samples)
-            '''
+
         else:
             print('Canceled')
 
