@@ -1,7 +1,7 @@
 '''GUI for the sample tab'''
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QTableView, QHBoxLayout,
-    QPushButton, QAbstractItemView
+    QPushButton, QAbstractItemView, QHeaderView
 )
 from .sample_table_model import SampleTableModel
 
@@ -25,7 +25,9 @@ class SampleTabWidget(QWidget):
         self.model = SampleTableModel(samples=samples)
         self.table.setModel(self.model)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-
+        header = self.table.horizontalHeader()
+        header.setStretchLastSection(True)
+        
         # Add button bar
         button_holder = QHBoxLayout()
         button_holder.setSpacing(10)
