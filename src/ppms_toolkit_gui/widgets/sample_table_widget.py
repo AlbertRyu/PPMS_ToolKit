@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QTableView, QHBoxLayout,
     QPushButton, QAbstractItemView, QHeaderView
 )
-from .sample_table_model import SampleTableModel
+from ..models.sample_table_model import SampleTableModel
 
 from infrastructure.db.db import LocalDB
 

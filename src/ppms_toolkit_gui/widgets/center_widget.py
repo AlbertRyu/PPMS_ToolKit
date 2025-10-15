@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QTabWidget
 from .plot_widget import PlotWidget
 from .analysis_widget import AnalysisWidget
 from .settings_widget import SettingWidget
-from .sample_widget import SampleTabWidget
+from .sample_table_widget import SampleTabWidget
 
 class MyCenterWidget(QTabWidget):
 

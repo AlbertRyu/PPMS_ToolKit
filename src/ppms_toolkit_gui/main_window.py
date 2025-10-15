@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMainWindow
-from .center_widget import MyCenterWidget
-from ..controller.plot_controller import PlotController 
-from ..controller.sample_controller import SampleController
+from .widgets.center_widget import MyCenterWidget
+from .controller.plot_controller import PlotController 
+from .controller.sample_controller import SampleController
 from PySide6.QtGui import QCloseEvent
 
 

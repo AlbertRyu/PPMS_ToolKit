@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QApplication, QDialog
 from PySide6.QtCore import QLocale, QCoreApplication
 from PySide6.QtGui import QGuiApplication
 
-from .gui.main_window import MainWindow
+from .main_window import MainWindow
 from .dialogs.project_dialog import ProjectDialog
 from infrastructure.db.db import LocalDB
 

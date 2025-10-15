@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from infrastructure.db.db import SampleDTO
 if TYPE_CHECKING:
-    from ..gui.sample_widget import SampleTabWidget
+    from ..widgets.sample_table_widget import SampleTabWidget
     from infrastructure.db.db import LocalDB
 
 from ..dialogs.sample_dialog import SampleDialog
