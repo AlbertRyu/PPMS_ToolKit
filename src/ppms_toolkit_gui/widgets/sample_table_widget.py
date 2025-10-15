@@ -25,7 +25,11 @@ class SampleTabWidget(QWidget):
         self.model = SampleTableModel(samples=samples)
         self.table.setModel(self.model)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.table.resizeColumnsToContents()
         header = self.table.horizontalHeader()
+        for col in range(header.count()):
+            w = header.sectionSize(col)
+            header.resizeSection(col, w + 15)
         header.setStretchLastSection(True)
         
         # Add button bar
