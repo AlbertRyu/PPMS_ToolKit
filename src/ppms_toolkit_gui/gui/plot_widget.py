@@ -35,7 +35,7 @@ class PlotWidget(QWidget):
         # Add a default measurement for debug purpose.
         from ppms_toolkit.measurement import VSMMeasurement
         m = VSMMeasurement(
-            filepath='/Users/ryunosuke/Documents/Research/PPMS/PPMS_ToolKit/examples/test_data/VSM_TestData_4Cl_IP/MT_0P1T_FC.DAT',
+            filepath='/Users/yunxiaoliu/Documents/Research/PPMS/PPMS_ToolKit/examples/test_data/VSM_TestData_4Cl_IP/MT_0P1T_FC.DAT',
             mode='MT',
             sample_orientation='In Plane',
             sample_mass=12
