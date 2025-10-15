@@ -68,7 +68,7 @@ class SampleController:
             QMessageBox.information(self.view, "Delete", "please first choose a line")
             return 
 
-        msg  = f"Confirm you want delete {sample.name}（mass={sample.mass}？This is irreversible"
+        msg  = f"Confirm you want delete {sample.name}（mass={sample.mass}mg)？This is irreversible"
         if QMessageBox.question(self.view, "Cofirm", msg,
                             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                             QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
