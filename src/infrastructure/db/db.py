@@ -1,7 +1,8 @@
 # src/yourapp_infra_local/db.py
 from __future__ import annotations
 from curses import meta
-from importlib import metadata
+import uuid
+from datetime import datetime
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
@@ -21,18 +22,19 @@ class SampleDTO:
 
 @dataclass(frozen=True)
 class MeasurementDTO:
-    id: int | None
     sample_id: int | None
     measurement_type: str
-    mode: str | None 
-    const_temperature: float | None
-    const_field: float | None      
-    original_filepath: str
-    data_filepath: str     
-    extra_parameters: dict | None 
-    comment: str           
-    created_at: str        
-    updated_at: str
+    id: int | None = None
+    mode: str | None = None
+    const_temperature: float | None = None
+    const_field: float | None = None      
+    original_filepath: str | None = None
+    data_filepath: str | None = None
+    processed_data_filepath: str | None = None
+    extra_parameters: dict | None  = None
+    comment: str | None  = None
+    created_at: str | None = None
+    updated_at: str | None = None
 
 class LocalDB:
     """最小可用 SQLite 封装，用于保存/读取 Sample 列表。"""
@@ -84,7 +86,7 @@ class LocalDB:
 
         self.con.commit()
     
-    def get_sample(self, sample_id: int) -> SampleDTO | None:
+    def get_sample(self, sample_id: int | None) -> SampleDTO | None:
         # get SampleDTO from sample ID, return None if not exist
         if sample_id is None:
             raise ValueError("sample_id must be provided")
@@ -181,12 +183,38 @@ class LocalDB:
     def select_vsm_measurement(self):
         pass
 
-    def add_measurement(self, dto: MeasurementDTO):
+    def add_measurement(self, dto: MeasurementDTO, raw_df, processed_df):
+        
+        sample = self.get_sample(dto.sample_id)
+        if sample is None:
+            raise ValueError(f"Sample with {dto.sample_id} does't exist.")
+        
+        measurement_uuid = uuid.uuid4().hex
+        data_dir = self.project_root / "data" / "measurements" / "raw"
+        proc_dir = self.project_root / "data" / "measurements" / "processed"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        proc_dir.mkdir(parents=True, exist_ok=True)
 
+        raw_parquet_path = Path(dto.data_filepath) if dto.data_filepath else data_dir / f"{dto.sample_id}_{measurement_uuid}.parquet"
+        processed_parquet_path = Path(dto.processed_data_filepath) if dto.processed_data_filepath else (proc_dir / f"{dto.sample_id}_{measurement_uuid}_proc.parquet")
+        # 写文件（如果有 DataFrame）
+        try:
+            if raw_df is not None:
+                raw_df.to_parquet(raw_parquet_path, compression='snappy')
+            if processed_df is not None:
+                processed_df.to_parquet(processed_parquet_path, compression='snappy')
+        except Exception as e:
+            # 清理失败文件
+            if raw_parquet_path.exists():
+                raw_parquet_path.unlink(missing_ok=True) # unlink means remove
+            if processed_parquet_path and processed_parquet_path.exists(): # missing_ok raise no error when files not there
+                processed_parquet_path.unlink(missing_ok=True)
+            raise # Raise error to the upper level
+
+        now = datetime.now().isoformat()
         cur = self.con.cursor()
         cur.execute(
             '''INSERT INTO measurements(
-            id
             sample_id
             measurement_type
             mode
@@ -194,29 +222,29 @@ class LocalDB:
             const_field
             original_filepath
             data_filepath
+            processed_data_filepath
             extra_parameters
             comment
             created_at 
             updated_at)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?));
             ''',
-            (dto.id, 
-             dto.sample_id, 
+            (dto.sample_id, 
              dto.measurement_type,
              dto.mode,
              dto.const_temperature,
              dto.const_field,
              dto.original_filepath,
-             dto.data_filepath,
-             dto.extra_parameters,
+             str(raw_parquet_path),
+             str(processed_parquet_path),
+             _serilize_data(dto.extra_parameters),
              dto.comment,
-             dto.created_at,
-             dto.updated_at)
+             now,
+             now)
             )
+        self.con.commit()
+        return cur.lastrowid
         
-
-        pass
-
     def del_measurement(self):
         pass
 
