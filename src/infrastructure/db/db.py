@@ -1,10 +1,11 @@
 # src/yourapp_infra_local/db.py
 from __future__ import annotations
-from typing import Optional, Any, Dict
+from curses import meta
+from importlib import metadata
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
-
+import json
 from ppms_toolkit.sample import Sample
 
 @dataclass(frozen=True)
@@ -22,7 +23,6 @@ class SampleDTO:
 class MeasurementDTO:
     id: int | None
     sample_id: int | None
-    name: str
     measurement_type: str
     mode: str | None 
     const_temperature: float | None
@@ -167,8 +167,53 @@ class LocalDB:
 
     ### Measurement related function.
     def select_vsm_measurement(self):
+        pass
 
-    
+    def add_measurement(self, dto: MeasurementDTO):
+
+        cur = self.con.cursor()
+        cur.execute(
+            '''INSERT INTO measurements(
+            id
+            sample_id
+            measurement_type
+            mode
+            const_temperature
+            const_field
+            original_filepath
+            data_filepath
+            extra_parameters
+            comment
+            created_at 
+            updated_at)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?));
+            ''',
+            (dto.id, 
+             dto.sample_id, 
+             dto.measurement_type,
+             dto.mode,
+             dto.const_temperature,
+             dto.const_field,
+             dto.original_filepath,
+             dto.data_filepath,
+             dto.extra_parameters,
+             dto.comment,
+             dto.created_at,
+             dto.updated_at)
+            )
+        
+
+        pass
+
+    def del_measurement(self):
+        pass
+
     def close(self):
         self.con.close()
 
+
+# Util Funcitons
+def _serilize_data(meta_data: dict | None):
+    if meta_data is None:
+        return None
+    return json.dumps(meta_data, ensure_ascii=False)
