@@ -55,7 +55,7 @@ class SampleController:
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             editted_sample = dlg.get_sample()
-            self.db.update_sampe(editted_sample)
+            self.db.update_sampel(editted_sample)
             self.refresh_table()
         else:
             print('Canceled')
