@@ -13,7 +13,6 @@ from ppms_toolkit.measurement import VSMMeasurement
 class PlotController:
     def __init__(self, view: 'PlotWidget') -> None:
         self.view = view
-
         self._connect_signal()
         
 
