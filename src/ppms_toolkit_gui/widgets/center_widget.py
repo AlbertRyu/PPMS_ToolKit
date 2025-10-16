@@ -11,10 +11,10 @@ class MyCenterWidget(QTabWidget):
     def __init__(self, db, parent =None):
         super().__init__(parent)
         self.db = db
-        self.plot_tab = PlotWidget(self)
+        self.plot_tab = PlotWidget(self.db)
         self.analysis_tab = AnalysisWidget()
         self.setting_tab = SettingWidget()
-        self.sample_tab = SampleTabWidget(db)
+        self.sample_tab = SampleTabWidget(self.db)
         self.addTab(self.sample_tab,"Sample Table")
         self.addTab(self.plot_tab,"General Plot")
         self.addTab(self.analysis_tab, "Fit")

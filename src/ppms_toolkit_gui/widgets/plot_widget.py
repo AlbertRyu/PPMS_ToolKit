@@ -1,3 +1,4 @@
+from infrastructure.db.db import LocalDB
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
@@ -8,10 +9,11 @@ from .measurement_list_widget import TitledMeasurementListWidget
 
 
 class PlotWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, db : LocalDB, parent=None):
         super().__init__(parent)
 
         self.canvas = MplCanvas()
+        self.db = db
 
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)

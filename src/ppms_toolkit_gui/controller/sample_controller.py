@@ -39,7 +39,7 @@ class SampleController:
         
     def add_sample(self):
         dlg = SampleDialog(self.db)
-
+        
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
             new_sample = dlg.get_sample()

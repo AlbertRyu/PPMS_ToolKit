@@ -22,7 +22,7 @@ class PlotController:
 
 
     def add_measurement(self):
-        dlg = NewMeasurementDialog(self.view)
+        dlg = NewMeasurementDialog(self.view, self.view.db.list_samples())
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
