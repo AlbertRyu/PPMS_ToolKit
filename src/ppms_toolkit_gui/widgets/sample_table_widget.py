@@ -32,7 +32,8 @@ class SampleTabWidget(QWidget):
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table.resizeColumnsToContents()
         header = self.table.horizontalHeader()
-        for col in range(header.count()):
+        header.resizeSection(0, 35) 
+        for col in range(1, header.count()):
             w = header.sectionSize(col)
             header.resizeSection(col, w + 15)
         header.setStretchLastSection(True)

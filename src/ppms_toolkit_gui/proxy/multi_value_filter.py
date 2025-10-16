@@ -23,6 +23,19 @@ class MultiValueFilterProxy(QSortFilterProxyModel):
                 return False
         return True    
 
+    def flags(self, index):
+        src = self.mapToSource(index)
+        src_model = self.sourceModel()
+        return src_model.flags(src)
+    
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+        src_index = self.mapToSource(index)
+        ok = self.sourceModel().setData(src_index, value, role)
+        if ok:
+            self.dataChanged.emit(index, index, [role])
+        return ok
+
+
     
 
 
