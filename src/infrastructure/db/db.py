@@ -15,7 +15,7 @@ class SampleDTO:
     name: str
     mass : float
     chemical: str
-    orientation: str
+    orientation: str | None
     created_at: str
     notes: str | None
 
@@ -227,7 +227,7 @@ class LocalDB:
             comment
             created_at 
             updated_at)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?));
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?);
             ''',
             (dto.sample_id, 
              dto.measurement_type,
@@ -237,11 +237,11 @@ class LocalDB:
              dto.original_filepath,
              str(raw_parquet_path),
              str(processed_parquet_path),
-             _serilize_data(dto.extra_parameters),
+             _serialize_data(dto.extra_parameters),
              dto.comment,
              now,
              now)
-            )
+        )
         self.con.commit()
         return cur.lastrowid
         
@@ -251,9 +251,8 @@ class LocalDB:
     def close(self):
         self.con.close()
 
-
 # Util Funcitons
-def _serilize_data(meta_data: dict | None):
+def _serialize_data(meta_data: dict | None):
     if meta_data is None:
         return None
     return json.dumps(meta_data, ensure_ascii=False)
