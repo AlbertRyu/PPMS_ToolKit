@@ -83,6 +83,18 @@ class LocalDB:
         """)
 
         self.con.commit()
+    
+    def get_sample(self, sample_id: int) -> SampleDTO | None:
+        # get SampleDTO from sample ID, return None if not exist
+        if sample_id is None:
+            raise ValueError("sample_id must be provided")
+
+        row = self.con.execute(
+            "SELECT id, name, mass, chemical, orientation, created_at, notes FROM samples WHERE id = ?",
+            (sample_id,)
+        ).fetchone()
+
+        return SampleDTO(*row) if row else None
 
     def add_sample(self, sample : SampleDTO):
         cur = self.con.cursor()
