@@ -116,7 +116,7 @@ class LocalDB:
         self.con.commit()
         return cur.lastrowid
     
-    def update_sampe(self, sample: SampleDTO):
+    def update_sampel(self, sample: SampleDTO):
         if sample.id is None:
             raise ValueError("update samples needs sample ID")
         sql = """
