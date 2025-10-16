@@ -1,6 +1,6 @@
 # src/yourapp_infra_local/db.py
 from __future__ import annotations
-from multiprocessing import Value
+from typing import Optional, Any, Dict
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
@@ -16,6 +16,23 @@ class SampleDTO:
     orientation: str
     created_at: str
     notes: str | None
+
+
+@dataclass(frozen=True)
+class MeasurementDTO:
+    id: int | None
+    sample_id: int | None
+    name: str
+    measurement_type: str
+    mode: str | None 
+    const_temperature: float | None
+    const_field: float | None      
+    original_filepath: str
+    data_filepath: str     
+    extra_parameters: dict | None 
+    comment: str           
+    created_at: str        
+    updated_at: str
 
 class LocalDB:
     """最小可用 SQLite 封装，用于保存/读取 Sample 列表。"""
@@ -147,6 +164,11 @@ class LocalDB:
             "SELECT id, name, mass, chemical, orientation, created_at, notes FROM samples ORDER BY created_at DESC"
         ).fetchall()
         return [SampleDTO(*r) for r in rows]
+
+    ### Measurement related function.
+    def select_vsm_measurement(self):
+
     
     def close(self):
         self.con.close()
+
