@@ -200,8 +200,35 @@ class LocalDB:
         return [SampleDTO(*r) for r in rows]
 
     ### Measurement related function.
-    def select_vsm_measurement(self):
-        pass
+    def select_vsm_measurements_from_sample_id(self, sample_id: int):
+        cur = self.con.cursor()
+        sql = (
+            "SELECT id, sample_id, measurement_type, original_filepath, mode, const_temperature, "
+            "const_field, data_filepath, processed_data_filepath, extra_parameters, comment, created_at, updated_at "
+            "FROM measurements "
+            "WHERE sample_id = ? AND measurement_type = ?"
+        )
+        rows = cur.execute(sql, (sample_id,"VSM",)).fetchall()
+        result = []
+        for row in rows:
+            extra = json.loads(row[9]) if row[9] else None
+            dto = MeasurementDTO(
+                sample_id=row[1],
+                measurement_type=row[2],
+                original_filepath=row[3],
+                id=row[0],
+                mode=row[4],
+                const_temperature=row[5],
+                const_field=row[6],
+                data_filepath=row[7],
+                processed_data_filepath=row[8],
+                extra_parameters=extra,
+                comment=row[10],
+                created_at=row[11],
+                updated_at=row[12],
+            )
+            result.append(dto)
+        return result
 
     def add_measurement(self, dto: MeasurementDTO, raw_df, processed_df):
         
