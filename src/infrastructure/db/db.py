@@ -41,7 +41,30 @@ class LocalDB:
         created_at   TEXT    NOT NULL 
             );
         CREATE INDEX IF NOT EXISTS idx_sample_created ON samples(created_at);
+
+        CREATE TABLE IF NOT EXISTS measurements (
+        id                INTEGER PRIMARY KEY AUTOINCREMENT,
+        sample_id         INTEGER NOT NULL,        -- 关联 samples.id
+        measurement_type  TEXT NOT NULL,          -- 'VSM','HeatCapacity',...
+        mode              TEXT,                   -- 只有 VSM 有，NULL表示不适用
+        const_temperature REAL,                   -- HC 常用
+        const_field       REAL,                   -- VSM 常用
+        original_filepath TEXT NOT NULL,          -- 原始导入文件（可为空或放路径）
+        data_filepath     TEXT NOT NULL,          -- Parquet 存储路径
+        extra_parameters  TEXT,                   -- JSON 字符串，存放任意测量专有字段（例如 {"mode":"MH"}）
+        comment           TEXT,
+        created_at        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+        FOREIGN KEY (sample_id) REFERENCES samples(id) ON DELETE CASCADE
+        );
+
+        -- 创建索引加速查询
+        CREATE INDEX IF NOT EXISTS idx_measurement_sample ON measurements(sample_id);
+        CREATE INDEX IF NOT EXISTS idx_measurement_type ON measurements(measurement_type);
+        CREATE INDEX IF NOT EXISTS idx_measurement_mode ON measurements(mode);
         """)
+
         self.con.commit()
 
     def add_sample(self, sample : SampleDTO):
