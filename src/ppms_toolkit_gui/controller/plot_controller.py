@@ -22,10 +22,6 @@ class PlotController:
         self.view.button_plot.clicked.connect(self.plot_measurement)
 
 
-    def test_function(self):
-        print('Test Signal!')
-
-
     def add_measurement(self):
         dlg = NewMeasurementDialog(self.view)
 
