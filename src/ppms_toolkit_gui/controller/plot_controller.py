@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..gui.plot_widget import PlotWidget
+    from ..widgets.plot_widget import PlotWidget
 
 from ppms_toolkit.measurement import VSMMeasurement
 
