@@ -1,13 +1,31 @@
 # src/yourapp_infra_local/db.py
 from __future__ import annotations
 from curses import meta
+from genericpath import exists
 import uuid
+import hashlib
 from datetime import datetime
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
 import json
 from ppms_toolkit.sample import Sample
+
+
+# Util Funcitons
+def _serialize_data(meta_data: dict | None):
+    if meta_data is None:
+        return None
+    return json.dumps(meta_data, ensure_ascii=False)
+
+
+def _sha256_of_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
 
 @dataclass(frozen=True)
 class SampleDTO:
@@ -24,11 +42,11 @@ class SampleDTO:
 class MeasurementDTO:
     sample_id: int | None
     measurement_type: str
+    original_filepath: str
     id: int | None = None
     mode: str | None = None
     const_temperature: float | None = None
     const_field: float | None = None      
-    original_filepath: str | None = None
     data_filepath: str | None = None
     processed_data_filepath: str | None = None
     extra_parameters: dict | None  = None
@@ -70,10 +88,12 @@ class LocalDB:
         const_field       REAL,                   -- VSM 常用
         original_filepath TEXT NOT NULL,          -- 原始导入文件（可为空或放路径）
         data_filepath     TEXT NOT NULL,          -- Parquet 存储路径
+        processed_data_filepath     TEXT NOT NULL,          -- Parquet 存储路径
         extra_parameters  TEXT,                   -- JSON 字符串，存放任意测量专有字段（例如 {"mode":"MH"}）
         comment           TEXT,
         created_at        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        content_hash      TEXT NOT NULL,
 
         FOREIGN KEY (sample_id) REFERENCES samples(id) ON DELETE CASCADE
         );
@@ -97,7 +117,7 @@ class LocalDB:
         ).fetchone()
 
         return SampleDTO(*row) if row else None
-
+    
     def add_sample(self, sample : SampleDTO):
         cur = self.con.cursor()
 
@@ -189,6 +209,11 @@ class LocalDB:
         if sample is None:
             raise ValueError(f"Sample with {dto.sample_id} does't exist.")
         
+        content_hash = _sha256_of_file(Path(dto.original_filepath))
+        existing = self.con.execute("SELECT original_filepath FROM measurements WHERE content_hash = ?", (content_hash,)).fetchone()
+        if existing:
+            return {"duplicate": True,  "Same content as": existing[0]}
+        
         measurement_uuid = uuid.uuid4().hex
         data_dir = self.project_root / "data" / "measurements" / "raw"
         proc_dir = self.project_root / "data" / "measurements" / "processed"
@@ -215,19 +240,20 @@ class LocalDB:
         cur = self.con.cursor()
         cur.execute(
             '''INSERT INTO measurements(
-            sample_id
-            measurement_type
-            mode
-            const_temperature
-            const_field
-            original_filepath
-            data_filepath
-            processed_data_filepath
-            extra_parameters
-            comment
-            created_at 
-            updated_at)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?);
+            sample_id,
+            measurement_type,
+            mode,
+            const_temperature,
+            const_field,
+            original_filepath,
+            data_filepath,
+            processed_data_filepath,
+            extra_parameters,
+            comment,
+            created_at, 
+            updated_at,
+            content_hash)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);
             ''',
             (dto.sample_id, 
              dto.measurement_type,
@@ -240,7 +266,8 @@ class LocalDB:
              _serialize_data(dto.extra_parameters),
              dto.comment,
              now,
-             now)
+             now,
+             content_hash)
         )
         self.con.commit()
         return cur.lastrowid
@@ -251,8 +278,3 @@ class LocalDB:
     def close(self):
         self.con.close()
 
-# Util Funcitons
-def _serialize_data(meta_data: dict | None):
-    if meta_data is None:
-        return None
-    return json.dumps(meta_data, ensure_ascii=False)
