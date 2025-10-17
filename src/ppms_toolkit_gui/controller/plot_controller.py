@@ -55,7 +55,6 @@ class PlotController:
                     mode = new_m.mode if new_m.mode else "None", # MH or MT
                     sample=cur_sample_entity
                 )
-                m.dataframe
                 self.view.db.add_measurement(new_m, m.raw_dataframe, m.dataframe)
 
                 if new_m.mode == 'MT':

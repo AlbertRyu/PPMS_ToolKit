@@ -239,7 +239,7 @@ class LocalDB:
         content_hash = _sha256_of_file(Path(dto.original_filepath))
         existing = self.con.execute("SELECT original_filepath FROM measurements WHERE content_hash = ?", (content_hash,)).fetchone()
         if existing:
-            return {"duplicate": True,  "Same content as": existing[0]}
+            raise ValueError(f"duplicate, Same content as: {existing[0]}")
         
         measurement_uuid = uuid.uuid4().hex
         data_dir = self.project_root / "data" / "measurements" / "raw"
