@@ -200,6 +200,16 @@ class LocalDB:
         return [SampleDTO(*r) for r in rows]
 
     ### Measurement related function.
+    def list_measurements(self) -> list[MeasurementDTO]:
+        rows = self.con.execute(
+            """
+            SELECT sample_id, measurement_type, original_filepath, id, mode, 
+            const_temperature, const_field, data_filepath, processed_data_filepath, 
+            extra_parameters, comment, created_at, updated_at 
+            FROM measurements ORDER BY created_at DESC"""
+        ).fetchall()
+        return [MeasurementDTO(*r) for r in rows]
+    
     def select_vsm_measurements_from_sample_id(self, sample_id: int):
         cur = self.con.cursor()
         sql = (

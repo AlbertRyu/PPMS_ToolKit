@@ -2,11 +2,12 @@ from infrastructure.db.db import LocalDB
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
-     QCheckBox, QFrame
+     QCheckBox, QFrame, QTableView, QAbstractItemView
     )
 from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar
-from .measurement_list_widget import TitledMeasurementListWidget
-
+from ..models.measurement_table_model import MeasurementTableModel
+from ..controller.header_filter_controller import HeaderFilterController
+from ..proxy.multi_value_filter import MultiValueFilterProxy
 
 class PlotWidget(QWidget):
     def __init__(self, db : LocalDB, parent=None):
@@ -28,12 +29,6 @@ class PlotWidget(QWidget):
                     self.btn_addline, self.btn_removeline]:
             toolbar.addWidget(btn)
 
-        self.vsm_mt_measurement_list = TitledMeasurementListWidget('VSM - MT')
-        self.vsm_mh_measurement_list = TitledMeasurementListWidget('VSM - MH')
-        vsm_list_layout = QVBoxLayout()
-        vsm_list_layout.addWidget(self.vsm_mt_measurement_list)
-        vsm_list_layout.addWidget(self.vsm_mh_measurement_list)
-
         self.button_add = QPushButton('Add Measurement')
         self.button_add.setStatusTip("Click to add a measurement from DAT file")
 
@@ -48,8 +43,23 @@ class PlotWidget(QWidget):
         button_holder.addWidget(self.button_plot)
         button_holder.addWidget(self.if_chi)
 
+        # The Measurement Table
+        measurements = self.db.list_measurements()
+        samples = self.db.list_samples()
+        self.table = QTableView()
+        self.model = MeasurementTableModel(measurements, samples)
+        proxy = MultiValueFilterProxy()
+        self.filter_controller = HeaderFilterController(self.table, proxy)
+        proxy.setSourceModel(self.model)
+        self.table.setModel(proxy)
+        self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.table.resizeColumnsToContents()
+        header = self.table.horizontalHeader()
+        header.setStretchLastSection(True)
+
+
         file_control_layout = QVBoxLayout()
-        file_control_layout.addLayout(vsm_list_layout)
+        file_control_layout.addWidget(self.table)
         file_control_layout.addLayout(button_holder)
         file_control_layout.setContentsMargins(10,10,10,10)
 

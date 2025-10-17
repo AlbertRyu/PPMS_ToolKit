@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QMainWindow
 from .widgets.center_widget import MyCenterWidget
 from .controller.plot_controller import PlotController 
 from .controller.sample_controller import SampleController
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtGui import QCloseEvent, QGuiApplication
 
 
 from typing import TYPE_CHECKING
@@ -27,6 +27,14 @@ class MainWindow(QMainWindow):
         self.plot_controller = PlotController(self.center_widget.plot_tab)
         self.sample_controller = SampleController(self.db, self.center_widget.sample_tab)
 
+        screen = QGuiApplication.primaryScreen().geometry()
+        self.resize(int(screen.width() * 0.9), int(screen.height() * 0.7)) 
+                                                   
+        # 居中到屏幕
+        frame_geo = self.frameGeometry()
+        center_point = QGuiApplication.primaryScreen().availableGeometry().center()
+        frame_geo.moveCenter(center_point)
+        self.move(frame_geo.topLeft())
 
         self.menuBar()
         self.statusBar()

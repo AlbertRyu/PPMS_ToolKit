@@ -133,7 +133,7 @@ class HeaderFilterController:
 
         x = header.sectionPosition(logical_index)
         pt = header.mapToGlobal(QPoint(x, header.height()))
-        menu.setFixedWidth(max(250,header.sectionSize(logical_index)))
+        menu.setFixedWidth(max(270,header.sectionSize(logical_index)))
         menu.popup(pt)
 
 
