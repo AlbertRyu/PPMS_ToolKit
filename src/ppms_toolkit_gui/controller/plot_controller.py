@@ -23,7 +23,7 @@ class PlotController:
 
     def _connect_signal(self):
         self.view.button_add.clicked.connect(self.add_measurement)
-        self.view.button_plot.clicked.connect(self.plot_measurement)
+        self.view.button_plot.clicked.connect(self._on_plot_clicked)
 
 
     def add_measurement(self):
@@ -57,24 +57,22 @@ class PlotController:
                 )
                 self.view.db.add_measurement(new_m, m.raw_dataframe, m.dataframe)
 
-                if new_m.mode == 'MT':
-                    name =(f'{m.sample_name} - {m.sample.orientation} - {m.const_field}Oe')
-                    self.view.vsm_mt_measurement_list.add_vsm_measurement(name, m)
-                elif new_m.mode == 'MT':
-                    name =(f'{m.sample_name} - {m.sample.orientation} - {m.const_temp} K')
-                    self.view.vsm_mh_measurement_list.add_vsm_measurement(name, m)
-                else:
-                    raise ValueError("Something is wrong ,there's no mode in VSM measurement.")
             except Exception as e:
                 QMessageBox.critical(self.view, "Error", str(e))
         else:
             print('Canceled')
 
-    def plot_measurement(self):
+    def _on_plot_clicked(self):
+
+        # Get all the checked measurement id.
+        self.view.
+
+
+
 
         self.view.canvas.ax.clear()
-        QList = self.view.vsm_mt_measurement_list
-        for i in range(QList.count()):
+
+
             item = QList.item(i)
             if item.checkState() == Qt.CheckState.Checked:
                 m : VSMMeasurement = item.data(Qt.ItemDataRole.UserRole)
