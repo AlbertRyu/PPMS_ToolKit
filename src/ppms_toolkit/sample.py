@@ -43,10 +43,12 @@ class Sample:
      All the parameters.
     '''
     def __init__(self, name: str,
-                 id: Optional[float] = None,
-                 mass: Optional[float] = None,
-                 make_date: Optional[str] = None):
+                 id: float | None = None,
+                 orientation: str | None = None,
+                 mass: float | None = None,
+                 make_date: str | None = None):
         self.name = name
+        self.orientation = orientation
         self.id = id
         self.mass = mass  # milligram
         self.make_date = \
@@ -118,8 +120,7 @@ class Sample:
         with open(filepath, "rb") as f:
             return pickle.load(f)
 
-    @staticmethod
-    def _vsm_measurement_reader(args):
+    def _vsm_measurement_reader(self, args):
 
         path, orientation = args
         if 'MT' in path:
@@ -129,7 +130,9 @@ class Sample:
         else:
             raise ValueError(f'Mode is not contained in filename of {path}')
     
-        m=VSMMeasurement(filepath=path, sample_orientation=orientation, mode=mode)
+        m=VSMMeasurement(filepath=path, 
+                         sample=self, 
+                         mode=mode)
 
         return m
 
@@ -153,13 +156,13 @@ class Sample:
 
         if paralelle:
             with Pool() as pool: 
-                measurements = pool.map(Sample._vsm_measurement_reader, arg_list)
+                measurements = pool.map(self._vsm_measurement_reader, arg_list)
 
             for m in measurements:
                 self.add_measurement(m)
         else:
             for args in arg_list:
-                m = Sample._vsm_measurement_reader(args)
+                m = self._vsm_measurement_reader(args)
                 self.add_measurement(m)
 
 

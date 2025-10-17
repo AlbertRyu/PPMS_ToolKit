@@ -34,18 +34,6 @@ class PlotWidget(QWidget):
         vsm_list_layout.addWidget(self.vsm_mt_measurement_list)
         vsm_list_layout.addWidget(self.vsm_mh_measurement_list)
 
-        # Add a default measurement for debug purpose.
-        from ppms_toolkit.measurement import VSMMeasurement
-        m = VSMMeasurement(
-            filepath='/Users/yunxiaoliu/Documents/Research/PPMS/PPMS_ToolKit/examples/test_data/VSM_TestData_4Cl_IP/MT_0P1T_FC.DAT',
-            mode='MT',
-            sample_orientation='In Plane',
-            sample_mass=12
-        )
-        name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_field}Oe')
-        self.vsm_mt_measurement_list.add_vsm_measurement(name, m)
-        # End of Test Measurement
-
         self.button_add = QPushButton('Add Measurement')
         self.button_add.setStatusTip("Click to add a measurement from DAT file")
 

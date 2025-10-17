@@ -1,5 +1,10 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
+from curses import curs_set
+from multiprocessing import Value
+
+import comm
+from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox
 from PySide6.QtCore import Qt
@@ -22,19 +27,45 @@ class PlotController:
 
 
     def add_measurement(self):
-        dlg = NewMeasurementDialog(self.view, self.view.db.list_samples())
+        database = self.view.db
+        samples = database.list_samples()
+        dlg = NewMeasurementDialog(self.view, samples)
+
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
-            pay_load = dlg._return_payload()
+            new_m = dlg.get_measurement()
+
             try:
-                m = VSMMeasurement(**pay_load)
-                if pay_load['mode'] == 'MT':
-                    name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_field}Oe')
+                sample_id = new_m.sample_id
+                cur_sample_DTO = database.get_sample(sample_id)
+                if cur_sample_DTO is None:
+                    raise ValueError("Something is wrong, no sample with this id exist.")
+
+                cur_sample_entity = Sample(
+                    name = cur_sample_DTO.name,
+                    id = cur_sample_DTO.id,
+                    orientation= cur_sample_DTO.orientation,
+                    mass = cur_sample_DTO.mass,
+                    make_date=cur_sample_DTO.created_at,
+                )
+
+                m = VSMMeasurement(
+                    filepath=new_m.original_filepath,
+                    mode = new_m.mode if new_m.mode else "None", # MH or MT
+                    sample=cur_sample_entity
+                )
+                m.dataframe
+                self.view.db.add_measurement(new_m, m.raw_dataframe, m.dataframe)
+
+                if new_m.mode == 'MT':
+                    name =(f'{m.sample_name} - {m.sample.orientation} - {m.const_field}Oe')
                     self.view.vsm_mt_measurement_list.add_vsm_measurement(name, m)
-                else:
-                    name =(f'{m.sample_name} - {m.sample_orientation} - {m.const_temp} K')
+                elif new_m.mode == 'MT':
+                    name =(f'{m.sample_name} - {m.sample.orientation} - {m.const_temp} K')
                     self.view.vsm_mh_measurement_list.add_vsm_measurement(name, m)
+                else:
+                    raise ValueError("Something is wrong ,there's no mode in VSM measurement.")
             except Exception as e:
                 QMessageBox.critical(self.view, "Error", str(e))
         else:

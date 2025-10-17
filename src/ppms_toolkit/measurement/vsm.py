@@ -24,30 +24,15 @@ if TYPE_CHECKING:
 class VSMMeasurement(Measurement):
     def __init__(self,
                  filepath: str,
-                 sample_orientation: str,
                  mode: str,
-                 sample: Optional["Sample"] = None,
-                 sample_mass: float = 1,
+                 sample: 'Sample',
                  comment: str = "",
                  metadata=None
                  ):
-        self.sample_orientation = sample_orientation
         self.mode = mode
-        self.sample_mass = sample_mass
-        super().__init__(filepath, sample, sample_mass, comment, metadata)
+        super().__init__(filepath, sample, comment, metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
-
-    @property
-    def sample_orientation(self):
-        return self._sample_orientation
-
-    @sample_orientation.setter
-    def sample_orientation(self, value):
-        if value not in ("In Plane", "Out of Plane"):
-            raise ValueError("sample_orientation have to be "
-                             "'In Plane' or 'Out of Plane'.")
-        self._sample_orientation = value
 
     @property
     def mode(self):
@@ -85,10 +70,10 @@ class VSMMeasurement(Measurement):
         df = raw_df[keys_to_keep].apply(pd.to_numeric, errors='coerce')
 
 
-        # Divide the Moment by sample_mass, if there's none 1 sample mass.
+        # Divide the Moment by, if there's none 1 sample mass.
         for col in df.columns:
             if re.match(r'Moment',col):
-                df[col] = df[col] / self.sample_mass
+                df[col] = df[col] / self.sample.mass
 
         if self.mode == 'MT':
             self.const_field = np.average(df.filter(regex='Magnetic Field')).round().astype(int)
@@ -111,11 +96,11 @@ class VSMMeasurement(Measurement):
     def __repr__(self):
         if self.mode == 'MT':
             return (f'{self.mode} on {self.sample_name} '
-                    f'with {self.sample_orientation} orientation '
+                    f'with {self.sample.orientation or "Unknown"} orientation '
                     f'at {self.const_field}Oe')
         else:
             return (f'{self.mode} on {self.sample_name} '
-                    f'with {self.sample_orientation} orientation '
+                    f'with {self.sample.orientation or "Unknown"} orientation '
                     f'at {self.const_temp}K')
         
     def plot(self, ax=None):
@@ -126,10 +111,10 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi'), label = f'{self.const_field}Oe - {self.condition} - {self.sample_orientation}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi'), label = f'{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi'), label = f'{self.const_temp}K - {self.sample_orientation}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi'), label = f'{self.const_temp}K - {self.sample.orientation or "Unknown Ori"}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
@@ -149,10 +134,10 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition} - {self.sample_orientation}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition} - {self.sample.orientation}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{self.const_temp}K - {self.sample_orientation}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{self.const_temp}K - {self.sample.orientation}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')

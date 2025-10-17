@@ -7,8 +7,12 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox,
     QRadioButton, QFileDialog, QVBoxLayout,QButtonGroup,
     QMessageBox, QComboBox
 )
+from PySide6.QtCore import Qt
+from infrastructure.db.db import MeasurementDTO
 
 from typing import TYPE_CHECKING
+
+from ppms_toolkit_gui.dialogs.sample_dialog import SampleDialog
 if TYPE_CHECKING:
     from infrastructure.db.db import SampleDTO
 
@@ -16,7 +20,7 @@ class NewMeasurementDialog(QDialog):
     def __init__(self, parent=None, samples: list[SampleDTO] = []):
         super().__init__(parent)
         self._samples = samples
-        self.setWindowTitle('New Measurement')
+        self.setWindowTitle('New VSM Measurement')
         form = QFormLayout(self)
 
         # Which Sample
@@ -87,14 +91,11 @@ class NewMeasurementDialog(QDialog):
 
         self.accept()
 
-    def _return_payload(self):
-        return {
-        "mode": self.mode_btn_group.checkedButton().text(),
-        #"sample_orientation": self.ori_btn_group.checkedButton().text(),
-       # "sample_mass": self.mass_spin.value(),
-        "filepath": self.file_edit.text().strip(),
-        }
-        
+    def get_measurement(self) -> MeasurementDTO:
+        return MeasurementDTO(sample_id=self.sample_combo.currentData(role=Qt.ItemDataRole.UserRole),
+                              measurement_type = 'VSM',
+                              mode=self.mode_btn_group.checkedButton().text(), 
+                              original_filepath=self.file_edit.text().strip())
 
 
 
