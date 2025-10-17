@@ -1,7 +1,6 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
 
-from email.contentmanager import ContentManager
 from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox
@@ -24,16 +23,18 @@ class PlotController:
         # 启动时加载所有 metadata（很快）
         self._all_measurements = {}
         self._all_samples = {}
+        self.samples = []
+        self.measurements = []
         self.refresh_metadata()
         
     def refresh_metadata(self):
         """Reload metadata, whenever a new """
-        measurements = self.db.list_measurements()
-        samples = self.db.list_samples()
-        self._all_measurements = {m.id: m for m in measurements}
-        self._all_samples = {s.id: s for s in samples}
-        self.view.model.refresh(measurements, samples)
-
+        self.measurements = self.db.list_measurements()
+        self.samples = self.db.list_samples()
+        self._all_measurements = {m.id: m for m in self.measurements}
+        self._all_samples = {s.id: s for s in self.samples}
+        self.view.model.refresh(self.measurements, self.samples)
+        self.view.table.resizeColumnsToContents()
     
     def _connect_signal(self):
         self.view.button_add.clicked.connect(self.add_measurement)
@@ -41,10 +42,9 @@ class PlotController:
 
 
     def add_measurement(self):
-        database = self.db
-        samples = database.list_samples()
+        samples = self.db.list_samples() 
+        # This database query is not ideal. But I don't know how I 
         dlg = NewMeasurementDialog(self.view, samples)
-
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
@@ -52,7 +52,7 @@ class PlotController:
 
             try:
                 sample_id = partial_m.sample_id
-                cur_sample_DTO = database.get_sample(sample_id)
+                cur_sample_DTO = self._all_samples[sample_id]
                 if cur_sample_DTO is None:
                     raise ValueError("Something is wrong, no sample with this id exist.")
 
@@ -80,7 +80,7 @@ class PlotController:
                     extra_parameters= {"condition" : m.condition}
                 )
 
-                database.add_measurement(new_m_DTO, m.raw_dataframe, m.dataframe)
+                self.db.add_measurement(new_m_DTO, m.raw_dataframe, m.dataframe)
                 self.refresh_metadata()
 
             except Exception as e:

@@ -11,7 +11,7 @@ class MyCenterWidget(QTabWidget):
     def __init__(self, db, parent =None):
         super().__init__(parent)
         self.db = db
-        self.plot_tab = PlotWidget(self.db)
+        self.plot_tab = PlotWidget()
         self.analysis_tab = AnalysisWidget()
         self.setting_tab = SettingWidget()
         self.sample_tab = SampleTabWidget(self.db)

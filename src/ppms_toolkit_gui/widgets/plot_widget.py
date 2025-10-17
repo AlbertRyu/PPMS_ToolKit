@@ -1,4 +1,3 @@
-from infrastructure.db.db import LocalDB
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
@@ -10,11 +9,10 @@ from ..controller.header_filter_controller import HeaderFilterController
 from ..proxy.multi_value_filter import MultiValueFilterProxy
 
 class PlotWidget(QWidget):
-    def __init__(self, db : LocalDB, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         self.canvas = MplCanvas()
-        self.db = db
 
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
@@ -44,16 +42,13 @@ class PlotWidget(QWidget):
         button_holder.addWidget(self.if_chi)
 
         # The Measurement Table
-        measurements = self.db.list_measurements()
-        samples = self.db.list_samples()
         self.table = QTableView()
-        self.model = MeasurementTableModel(measurements, samples)
+        self.model = MeasurementTableModel([], []) # Measurement is added when Controller is initialized.
         proxy = MultiValueFilterProxy()
         self.filter_controller = HeaderFilterController(self.table, proxy)
         proxy.setSourceModel(self.model)
         self.table.setModel(proxy)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.table.resizeColumnsToContents()
         header = self.table.horizontalHeader()
         header.setStretchLastSection(True)
 

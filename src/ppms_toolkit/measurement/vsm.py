@@ -6,9 +6,8 @@ VSM experiment condition:
 [Sample Orientation]
 '''
 
-import comm
 from .base import Measurement
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd

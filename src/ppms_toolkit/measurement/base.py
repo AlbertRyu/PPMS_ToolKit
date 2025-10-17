@@ -4,7 +4,6 @@ a backbone for its desecendent class, [HeatCapacityMeasurment],
 [Magnetism Measurement], etc.
 '''
 from abc import ABC, abstractmethod
-from multiprocessing.context import assert_spawning
 from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from ppms_toolkit.sample import Sample  # Avoid Cylic-Import

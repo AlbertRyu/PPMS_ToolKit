@@ -1,7 +1,6 @@
 # This define what the sample model should be like and how 
 # it reads data from the sqlite database.
 
-from multiprocessing import Value
 from typing import Any
 from PySide6.QtCore import QAbstractTableModel, QPersistentModelIndex, Qt, QModelIndex
 
@@ -14,7 +13,7 @@ class MeasurementTableModel(QAbstractTableModel):
         super().__init__()
         self.measurements = measurements
         self.sample_by_id = {s.id: s for s in samples if getattr(s, "id", None) is not None}
-        self.headers = ["Checked", "Sample", "Mass", "Orientation", "Field", "Temp","Notes"]
+        self.headers = ["Checked", "Sample", "Mass(mg)", "Orientation", "Field(Oe)", "Temp(K)","Notes"]
         self._checked_by_id: dict[int, bool] = {} # Set which measurement is checked
         # Initially all is unchecked.
         for m in self.measurements:
