@@ -1,8 +1,11 @@
 from ..adapters.mpl_canvas import MplCanvas
 from PySide6.QtWidgets import \
     (QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
-     QCheckBox, QFrame, QTableView, QAbstractItemView
+     QCheckBox, QFrame, QTableView, QAbstractItemView,
+     QLabel
     )
+
+from PySide6.QtCore import Qt
 from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar
 from ..models.measurement_table_model import MeasurementTableModel
 from ..controller.header_filter_controller import HeaderFilterController
@@ -52,8 +55,20 @@ class PlotWidget(QWidget):
         header = self.table.horizontalHeader()
         header.setStretchLastSection(True)
 
+        # Title Row
+        title_label = QLabel("VSM Measurements ")
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # 设置样式：加大字体、加粗
+        title_label.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+            }
+        """)
 
         file_control_layout = QVBoxLayout()
+        file_control_layout.addWidget(title_label)
         file_control_layout.addWidget(self.table)
         file_control_layout.addLayout(button_holder)
         file_control_layout.setContentsMargins(10,10,10,10)
@@ -63,7 +78,7 @@ class PlotWidget(QWidget):
         plot_layout = QVBoxLayout()
         plot_layout.addWidget(self.canvas.canvas)
         plot_layout.addWidget(self.toolbar)
-        plot_layout.setContentsMargins(10,10,10,10)
+        plot_layout.setContentsMargins(10,0,10,10)
 
 
         vline = QFrame()
