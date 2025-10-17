@@ -84,10 +84,11 @@ class MeasurementTableModel(QAbstractTableModel):
             return self.headers [section]
         return super().headerData(section, orientation, role)
     
-    def refresh(self, new_meansurements):
+    def refresh(self, new_meansurements, new_samples):
         old_checked = dict(self._checked_by_id)
         self.beginResetModel()  # 通知视图“我要换数据了”
         self.measurements = new_meansurements
+        self.sample_by_id = {s.id: s for s in new_samples if getattr(s, "id", None) is not None}
         #Defensive Coding, just to make sure.
         #reinit checked_by_id, preserving by id, 
         self._checked_by_id = {}
@@ -98,5 +99,5 @@ class MeasurementTableModel(QAbstractTableModel):
         self.endResetModel()    # 通知视图“数据换完了，重画吧”
 
     def get_checked_meansurement_ids(self) -> list:
-        """Return list of sample ids that are currently checked (in arbitrary order)."""
-        return [sid for sid, v in self._checked_by_id.items() if v]
+        """Return list of measurement ids that are currently checked (in arbitrary order)."""
+        return [mid for mid, v in self._checked_by_id.items() if v]

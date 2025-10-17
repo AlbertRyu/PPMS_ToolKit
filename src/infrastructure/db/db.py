@@ -208,7 +208,29 @@ class LocalDB:
             extra_parameters, comment, created_at, updated_at 
             FROM measurements ORDER BY created_at DESC"""
         ).fetchall()
-        return [MeasurementDTO(*r) for r in rows]
+        result = []
+        for row in rows:
+            # row[9] 是 extra_parameters
+            extra = json.loads(row[9]) if row[9] else None
+            
+            dto = MeasurementDTO(
+                sample_id=row[0],
+                measurement_type=row[1],
+                original_filepath=row[2],
+                id=row[3],
+                mode=row[4],
+                const_temperature=row[5],
+                const_field=row[6],
+                data_filepath=row[7],
+                processed_data_filepath=row[8],
+                extra_parameters=extra,  # ✅ 反序列化后的 dict
+                comment=row[10],
+                created_at=row[11],
+                updated_at=row[12]
+            )
+            result.append(dto)
+        return result
+    
     
     def select_vsm_measurements_from_sample_id(self, sample_id: int):
         cur = self.con.cursor()

@@ -6,6 +6,7 @@ VSM experiment condition:
 [Sample Orientation]
 '''
 
+import comm
 from .base import Measurement
 from typing import TYPE_CHECKING, Optional
 
@@ -23,16 +24,32 @@ if TYPE_CHECKING:
 
 class VSMMeasurement(Measurement):
     def __init__(self,
-                 filepath: str,
-                 mode: str,
-                 sample: 'Sample',
-                 comment: str = "",
-                 metadata=None
+                    mode: str,
+                    sample: 'Sample',
+                    filepath: str | None = None,
+                    raw_dataframe: pd.DataFrame | None = None,  # 新增
+                    processed_dataframe: pd.DataFrame | None = None,  # 新增
+                    comment: str = "",
+                    metadata: dict | None =None
                  ):
         self.mode = mode
-        super().__init__(filepath, sample, comment, metadata)
-        if sample:  # If sample is inputted, add this mesurement in the sample.
-            sample.add_measurement(self)
+        self.const_temp = None
+        self.const_field = None
+        self.condition = None
+        super().__init__(
+            filepath=filepath, 
+            sample=sample, 
+            comment=comment, 
+            metadata=metadata,
+            raw_dataframe=raw_dataframe,
+            processed_dataframe=processed_dataframe)
+        
+        if metadata:
+            self.const_field = metadata.get('const_field')
+            self.const_temp = metadata.get('const_temp') or metadata.get('const_temperature')
+            self.condition = metadata.get('condition') 
+
+        sample.add_measurement(self)
 
     @property
     def mode(self):
@@ -54,9 +71,8 @@ class VSMMeasurement(Measurement):
                 "instance": self
         }
     
-    def process_data(self, raw_df) -> pd.DataFrame:      
+    def process_data(self, raw_df, filepath) -> pd.DataFrame:      
         import re
-
 
         pattern = (     
                 r'^Temperature \(|'
@@ -80,9 +96,9 @@ class VSMMeasurement(Measurement):
             for col in df.columns:
                 if re.match(r'Moment',col):
                     df['chi'] = df[col] / self.const_field
-            if re.search(r'ZFC', self.filepath):
+            if re.search(r'ZFC', filepath):
                 self.condition = 'ZFC'
-            elif re.search(r'FC', self.filepath):
+            elif re.search(r'FC', filepath):
                 self.condition = 'FC'
             else:
                 self.condition = 'Unknown Condition'
