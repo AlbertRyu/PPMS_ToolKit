@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.sample_controller = SampleController(self.db, self.center_widget.sample_tab)
 
         screen = QGuiApplication.primaryScreen().geometry()
-        self.resize(int(screen.width() * 0.9), int(screen.height() * 0.7)) 
+        self.resize(int(screen.width() * 0.8), int(screen.height() * 0.6)) 
                                                    
         # 居中到屏幕
         frame_geo = self.frameGeometry()
