@@ -48,43 +48,44 @@ class PlotController:
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             print('Accepted')
-            partial_m = dlg.get_measurement()
+            partial_ms = dlg.get_measurements()
+            for partial_m in partial_ms:
+                try:
+                    sample_id = partial_m.sample_id
+                    cur_sample_DTO = self._all_samples[sample_id]
+                    if cur_sample_DTO is None:
+                        raise ValueError("Something is wrong, no sample with this id exist.")
 
-            try:
-                sample_id = partial_m.sample_id
-                cur_sample_DTO = self._all_samples[sample_id]
-                if cur_sample_DTO is None:
-                    raise ValueError("Something is wrong, no sample with this id exist.")
+                    cur_sample_entity = Sample(
+                        name = cur_sample_DTO.name,
+                        id = cur_sample_DTO.id,
+                        orientation= cur_sample_DTO.orientation,
+                        mass = cur_sample_DTO.mass,
+                        make_date=cur_sample_DTO.created_at,
+                    )
 
-                cur_sample_entity = Sample(
-                    name = cur_sample_DTO.name,
-                    id = cur_sample_DTO.id,
-                    orientation= cur_sample_DTO.orientation,
-                    mass = cur_sample_DTO.mass,
-                    make_date=cur_sample_DTO.created_at,
-                )
+                    m = VSMMeasurement(
+                        filepath=partial_m.original_filepath,
+                        mode = partial_m.mode if partial_m.mode else "None", # MH or MT
+                        sample=cur_sample_entity
+                    )
 
-                m = VSMMeasurement(
-                    filepath=partial_m.original_filepath,
-                    mode = partial_m.mode if partial_m.mode else "None", # MH or MT
-                    sample=cur_sample_entity
-                )
+                    new_m_DTO = MeasurementDTO(
+                        sample_id=partial_m.sample_id,
+                        measurement_type=partial_m.measurement_type,
+                        mode=partial_m.mode,
+                        original_filepath=partial_m.original_filepath,
+                        const_field= float(m.const_field) if m.const_field is not None else None,
+                        const_temperature= float(m.const_temp) if m.const_temp is not None else None,
+                        extra_parameters= {"condition" : m.condition}
+                    )
 
-                new_m_DTO = MeasurementDTO(
-                    sample_id=partial_m.sample_id,
-                    measurement_type=partial_m.measurement_type,
-                    mode=partial_m.mode,
-                    original_filepath=partial_m.original_filepath,
-                    const_field= float(m.const_field) if m.const_field is not None else None,
-                    const_temperature= float(m.const_temp) if m.const_temp is not None else None,
-                    extra_parameters= {"condition" : m.condition}
-                )
+                    self.db.add_measurement(new_m_DTO, m.raw_dataframe, m.dataframe)
 
-                self.db.add_measurement(new_m_DTO, m.raw_dataframe, m.dataframe)
-                self.refresh_metadata()
+                except Exception as e:
+                    QMessageBox.critical(self.view, "Error", str(e))
+            self.refresh_metadata()
 
-            except Exception as e:
-                QMessageBox.critical(self.view, "Error", str(e))
         else:
             print('Canceled')
 

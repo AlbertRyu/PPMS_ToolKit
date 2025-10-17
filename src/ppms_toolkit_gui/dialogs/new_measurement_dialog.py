@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox,
     QFormLayout, QDoubleSpinBox, QLineEdit, QPushButton,
     QWidget, QHBoxLayout, QAbstractSpinBox, QGroupBox,
     QRadioButton, QFileDialog, QVBoxLayout,QButtonGroup,
-    QMessageBox, QComboBox
+    QMessageBox, QComboBox, QListWidget
 )
 from PySide6.QtCore import Qt
 from infrastructure.db.db import MeasurementDTO
@@ -28,19 +28,26 @@ class NewMeasurementDialog(QDialog):
         for sample in self._samples:
             self.sample_combo.addItem(f'{sample.name}-{sample.mass}mg', userData=sample.id)
 
-        # File Row 
-        self.file_edit = QLineEdit(placeholderText='Select your file')
-        self.browse_btn = QPushButton('Browse')
+        # File list section (supports batch import)
+        self.file_list = QListWidget()
+        self.file_list.setMaximumHeight(150)
+        
+        self.browse_btn = QPushButton('Browse Files')
         self.browse_btn.clicked.connect(self._on_browse)
-
-        # Fundamental infomation - Noe 
-        # self.mass_spin = QDoubleSpinBox(suffix=" mg", value=1)
-        # self.mass_spin.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        
+        self.clear_btn = QPushButton('Clear')
+        self.clear_btn.clicked.connect(self.file_list.clear)
 
         file_row = QWidget()
-        file_layout = QHBoxLayout(file_row)
-        file_layout.addWidget(self.file_edit)
-        file_layout.addWidget(self.browse_btn)
+        file_layout = QVBoxLayout(file_row)
+        
+        
+        btn_row = QHBoxLayout()
+        btn_row.addWidget(self.browse_btn)
+        btn_row.addWidget(self.clear_btn)
+        
+        #file_layout.addLayout(btn_row)
+        #file_layout.addWidget(self.file_list)
 
         # Select MT/MH
         self.mode = QGroupBox('Mode of Exp')
@@ -61,24 +68,26 @@ class NewMeasurementDialog(QDialog):
 
         # Add everything into form 
         form.addRow("Sample", self.sample_combo)
-        form.addRow(file_row)
+        form.addRow("Add Files", btn_row)
+        form.addRow(self.file_list)
         form.addRow(self.mode)
         form.addRow(buttons)
 
     def _on_browse(self):
-        path, _ = QFileDialog.getOpenFileName(
+        paths, _ = QFileDialog.getOpenFileNames(
             self,
             "Select your data file",              # 对话框标题
             "",                                   # 起始目录
             "Data Files (*.csv *.txt *.dat);;All Files (*)"  # 过滤器
         )
-        if path:  # 用户没点“取消”
-            self.file_edit.setText(path)
+        if paths:
+            self.file_list.clear()
+            self.file_list.addItems(paths)
 
     def _on_accept(self):
         # Check if every value exist.
-        if not self.file_edit.text():
-            QMessageBox.critical(self,'Warning','No dat file path')
+        if self.file_list.count() == 0:
+            QMessageBox.critical(self, 'Warning', 'No data file selected')
             return
     
         if not self.mode_btn_group.checkedButton():
@@ -91,11 +100,23 @@ class NewMeasurementDialog(QDialog):
 
         self.accept()
 
-    def get_measurement(self) -> MeasurementDTO:
-        return MeasurementDTO(sample_id=self.sample_combo.currentData(role=Qt.ItemDataRole.UserRole),
-                              measurement_type = 'VSM',
-                              mode=self.mode_btn_group.checkedButton().text(), 
-                              original_filepath=self.file_edit.text().strip())
+    def get_measurements(self) -> list[MeasurementDTO]:
+        
+        measurements = []
+        sample_id = self.sample_combo.currentData(role=Qt.ItemDataRole.UserRole)
+        mode=self.mode_btn_group.checkedButton().text()
+
+        for i in range(self.file_list.count()):
+            filepath = self.file_list.item(i).text()
+            m_DTO = MeasurementDTO(
+                sample_id=sample_id,
+                measurement_type="VSM",
+                mode=mode,
+                original_filepath=filepath
+            )
+            measurements.append(m_DTO)
+        
+        return measurements
 
 
 
