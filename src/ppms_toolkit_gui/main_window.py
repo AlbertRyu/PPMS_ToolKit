@@ -3,6 +3,9 @@ from .widgets.center_widget import MyCenterWidget
 from .controller.plot_controller import PlotController 
 from .controller.sample_controller import SampleController
 from PySide6.QtGui import QCloseEvent, QGuiApplication
+from PySide6.QtGui import QIcon
+
+from pathlib import Path
 
 
 from typing import TYPE_CHECKING
@@ -13,6 +16,11 @@ if TYPE_CHECKING:
 class MainWindow(QMainWindow):
     def __init__(self, db: "LocalDB"):
         super().__init__()
+
+        # 设置窗口图标
+        icon_path = Path(__file__).parent.parent / "resources" / "app_icon.png"
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
 
         self.db = db
 

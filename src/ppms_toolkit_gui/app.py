@@ -5,11 +5,17 @@ from PySide6.QtGui import QGuiApplication
 from .main_window import MainWindow
 from .dialogs.project_dialog import ProjectDialog
 from infrastructure.db.db import LocalDB
-
+from PySide6.QtGui import QIcon
+from pathlib import Path
 import sys
 
 def main():
     app = QApplication(sys.argv)
+
+    # 设置全局应用图标（Windows 任务栏）
+    icon_path = Path(__file__).parent.parent / "resources" / "app_icon.png"
+    if icon_path.exists():
+        app.setWindowIcon(QIcon(str(icon_path)))
 
     QCoreApplication.setOrganizationName("PPMS_Toolkit")
     QCoreApplication.setApplicationName("GUI_Configuration")
