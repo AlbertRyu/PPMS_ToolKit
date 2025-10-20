@@ -171,6 +171,8 @@ class PlotController:
             else:
                 vsm.plot_magnetisation(ax=self.view.canvas.ax)
 
+                
+        self.view.canvas.figure.tight_layout()
         self.view.canvas.canvas.draw()
         self.view.toolbar.update()        # 让 toolbar 重新检测新的 artists
         self.view.toolbar.push_current()  # 保存当前视图为新的“home”
