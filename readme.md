@@ -324,14 +324,6 @@ See [LICENSE](LICENSE) file for full details.
 
 ---
 
-## 👤 Author
-
-**Yunxiao LIU**
-- Email: yunxiao.liu@tum.de
-- GitHub: [@AlbertRyu](https://github.com/AlbertRyu)
-
----
-
 ## 🙏 Acknowledgments
 
 - Built with [PySide6](https://doc.qt.io/qtforpython/) (Qt for Python)
