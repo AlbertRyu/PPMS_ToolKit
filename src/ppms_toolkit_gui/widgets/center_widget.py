@@ -16,6 +16,6 @@ class MyCenterWidget(QTabWidget):
         self.setting_tab = SettingWidget()
         self.sample_tab = SampleTabWidget(self.db)
         self.addTab(self.sample_tab,"Sample Table")
-        self.addTab(self.plot_tab,"General Plot")
-        self.addTab(self.analysis_tab, "Fit")
-        self.addTab(self.setting_tab, "Settings")
+        self.addTab(self.plot_tab,"Measurements | Plot")
+        #self.addTab(self.analysis_tab, "Fit")
+        #self.addTab(self.setting_tab, "Settings"
