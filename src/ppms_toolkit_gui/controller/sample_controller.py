@@ -13,13 +13,20 @@ if TYPE_CHECKING:
 from ..dialogs.sample_dialog import SampleDialog
 from PySide6.QtWidgets import QDialog, QMessageBox
 
+from PySide6.QtCore import QObject, Signal
+
 #from ppms_toolkit.sample import Sample 
 
-class SampleController:
+class SampleController(QObject):
+
+    sample_data_changed = Signal()
+
     def __init__(self, db: 'LocalDB', view: 'SampleTabWidget') -> None:
+        super().__init__()
         self.view = view
         self.db = db
         self._connect_signal()
+
         
 
     def _connect_signal(self):
@@ -57,6 +64,7 @@ class SampleController:
             editted_sample = dlg.get_sample()
             self.db.update_sampel(editted_sample)
             self.refresh_table()
+            self.sample_data_changed.emit()
         else:
             print('Canceled')
 
@@ -76,6 +84,8 @@ class SampleController:
         
         self.db.delete_sample(sample)
         self.refresh_table()
+        self.sample_data_changed.emit()
+
 
     def refresh_table(self):
         new_samples = self.db.list_samples()

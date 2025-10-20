@@ -39,6 +39,11 @@ class MainWindow(QMainWindow):
         self.menuBar()
         self.statusBar()
 
+        # Connect the signal 
+        self.sample_controller.sample_data_changed.connect(
+            self.plot_controller.refresh_metadata
+        )
+
     def closeEvent(self, event: QCloseEvent):
         # 应用窗口关闭时关闭数据库
         if self.db:
