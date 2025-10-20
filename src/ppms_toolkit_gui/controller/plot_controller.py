@@ -1,6 +1,7 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
 
+from random import sample
 from tabnanny import check
 
 from traitlets import This
@@ -56,7 +57,10 @@ class PlotController:
             for partial_m in partial_ms:
                 try:
                     sample_id = partial_m.sample_id
-                    cur_sample_DTO = self._all_samples[sample_id]
+
+                    cur_sample_DTO = self._all_samples.get(sample_id, None)
+                    if cur_sample_DTO is None:
+                        cur_sample_DTO = self.db.get_sample(sample_id)
                     if cur_sample_DTO is None:
                         raise ValueError("Something is wrong, no sample with this id exist.")
 

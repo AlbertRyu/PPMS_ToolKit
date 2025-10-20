@@ -80,4 +80,5 @@ class SampleController:
     def refresh_table(self):
         new_samples = self.db.list_samples()
         self.view.model.refresh_samples(new_samples)
+        self.view.table.resizeColumnsToContents()
 
