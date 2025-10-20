@@ -22,7 +22,7 @@ class ProjectDialog(QDialog):
         self.setContentsMargins(20, 10, 20, 10)
         self.setFixedSize(500,180)
 
-        self.label = QLabel('choose a work folder to start using       :)')
+        self.label = QLabel('choose a working directory to start using       :)')
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)       # 水平垂直居中
         font = QFont()
         font.setPointSize(15)

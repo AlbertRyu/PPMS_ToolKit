@@ -13,7 +13,7 @@ class MeasurementTableModel(QAbstractTableModel):
         super().__init__()
         self.measurements = measurements
         self.sample_by_id = {s.id: s for s in samples if getattr(s, "id", None) is not None}
-        self.headers = ["Checked", "Sample" ,"Orientation", "Condition", "Field(Oe)", "Temp(K)","Notes"]
+        self.headers = ["Checked", "Sample" ,"Chemical", "Orientation", "Condition", "Field(Oe)", "Temp(K)","Notes"]
         self._checked_by_id: dict[int, bool] = {} # Set which measurement is checked
         # Initially all is unchecked.
         for m in self.measurements:
@@ -46,6 +46,7 @@ class MeasurementTableModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             return [
                 sample.name,
+                sample.chemical,
                 sample.orientation,
                 condition,
                 measurement.const_field,
