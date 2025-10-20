@@ -170,9 +170,47 @@ class PlotController:
                     #print(line)
             else:
                 vsm.plot_magnetisation(ax=self.view.canvas.ax)
+            
+
+        legend = self.view.canvas.ax.legend()
+        if legend:
+            legend.set_draggable(True)  # 可拖动
+            # 启用交互式图例（点击隐藏/显示线条）
+            self._setup_interactive_legend(legend)
 
                 
         self.view.canvas.figure.tight_layout()
         self.view.canvas.canvas.draw()
         self.view.toolbar.update()        # 让 toolbar 重新检测新的 artists
         self.view.toolbar.push_current()  # 保存当前视图为新的“home”
+
+    def _setup_interactive_legend(self, legend):
+        """设置可点击的图例来显示/隐藏线条"""
+        # 存储原始可见性
+        lined = {}  # 将图例线条映射到绘图线条
+        
+        for legline, origline in zip(legend.get_lines(), self.view.canvas.ax.get_lines()):
+            legline.set_picker(5)  # 5 pts tolerance
+            lined[legline] = origline
+        
+        def on_pick(event):
+            # 在图例上点击时触发
+            legline = event.artist
+
+            # ✅ 检查点击的是否是图例中的线条对象
+            if legline not in lined:
+                return  # 如果不是线条（比如是整个图例框），忽略
+            origline = lined[legline]
+            visible = not origline.get_visible()
+            origline.set_visible(visible)
+            # 改变图例线条的透明度
+            legline.set_alpha(1.0 if visible else 0.2)
+            self.view.canvas.canvas.draw()
+        
+        # 连接 pick 事件
+        self.view.canvas.canvas.mpl_connect('pick_event', on_pick)
+
+            # 只连接一次（避免重复）
+        if not hasattr(self, '_legend_pick_connected'):
+            self.view.canvas.canvas.mpl_connect('pick_event', on_pick)
+            self._legend_pick_connected = True
