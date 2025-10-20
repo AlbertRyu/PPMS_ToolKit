@@ -2,6 +2,7 @@
 from __future__ import annotations
 from curses import meta
 from genericpath import exists
+from multiprocessing import Value
 import uuid
 import hashlib
 from datetime import datetime
@@ -331,8 +332,50 @@ class LocalDB:
         self.con.commit()
         return cur.lastrowid
         
-    def del_measurement(self):
-        pass
+    def del_measurement(self, mid: int):
+        if mid is None:
+            raise ValueError('Mid must not be none')
+        cur = self.con.cursor()
+        # 1) Query the row to get file paths
+        row = cur.execute(
+            "SELECT data_filepath, processed_data_filepath FROM measurements WHERE id = ?",
+            (mid,)
+        ).fetchone()
+        if not row:
+            cur.close()
+            return 0  # nothing to delete
+
+        data_fp, proc_fp = row[0], row[1]
+
+        # 2) Try to delete files (if present). Collect errors to raise if necessary.
+        errors = []
+        for p in (data_fp, proc_fp):
+            if p:
+                try:
+                    ppath = Path(p)
+                    if ppath.exists():
+                        ppath.unlink()
+                except Exception as e:
+                    errors.append((p, str(e)))
+
+        if errors:
+            cur.close()
+            # raise a combined exception so caller knows which files failed
+            msgs = "; ".join([f"{p}: {m}" for p, m in errors])
+            raise IOError(f"Failed to delete files for measurement {mid}: {msgs}")
+        
+        # 3) Delete DB row inside transaction
+        try:
+            cur.execute("DELETE FROM measurements WHERE id = ?", (mid,))
+            deleted = cur.rowcount
+            self.con.commit()
+            cur.close()
+            return deleted
+        except Exception:
+            self.con.rollback()
+            cur.close()
+            raise
+        
 
     def close(self):
         self.con.close()

@@ -35,12 +35,16 @@ class PlotWidget(QWidget):
 
         self.button_plot = QPushButton('Plot')
         self.button_plot.setStatusTip("Click to Plot selected measurements")
-    
+
+        self.button_del = QPushButton('Delete Measurement')
+        self.button_del.setStatusTip('Click to delete selected measurements')
+
         self.if_chi = QCheckBox('Succeptiblity')
         self.if_chi.setStatusTip('Checked to plot suceptbity, otherwise moment')
 
         button_holder = QHBoxLayout()
         button_holder.addWidget(self.button_add)
+        button_holder.addWidget(self.button_del)
         button_holder.addWidget(self.button_plot)
         button_holder.addWidget(self.if_chi)
 

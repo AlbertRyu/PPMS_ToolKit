@@ -1,6 +1,9 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
 
+from tabnanny import check
+
+from traitlets import This
 from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox
@@ -39,6 +42,7 @@ class PlotController:
     def _connect_signal(self):
         self.view.button_add.clicked.connect(self.add_measurement)
         self.view.button_plot.clicked.connect(self._on_plot_clicked)
+        self.view.button_del.clicked.connect(self.del_measurements)
 
 
     def add_measurement(self):
@@ -88,6 +92,19 @@ class PlotController:
 
         else:
             print('Canceled')
+
+    def del_measurements(self):
+        print('Clicked Del')
+        checked_ids = self.view.model.get_checked_meansurement_ids()
+        print(checked_ids)
+        if not checked_ids:
+            print("this?")
+            return
+        
+        for mid in checked_ids:
+            self.db.del_measurement(mid)
+        self.refresh_metadata()
+
 
     def _on_plot_clicked(self):
 
