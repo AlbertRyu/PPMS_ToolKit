@@ -173,6 +173,32 @@ class LocalDB:
         if sample is None:
             return 0
         cur = self.con.cursor()
+         # 1. Query measurements
+        rows = cur.execute(
+            "SELECT id, data_filepath, processed_data_filepath FROM measurements WHERE sample_id = ?",
+            (sample.id,)
+        ).fetchall()
+        
+        # 2. Delete parquet files
+        file_errors = []
+        for row in rows:
+            mid, data_fp, proc_fp = row[0], row[1], row[2]
+            for fp in (data_fp, proc_fp):
+                if fp:
+                    try:
+                        p = Path(fp)
+                        if p.exists():
+                            p.unlink()
+                    except Exception as e:
+                        file_errors.append((fp, str(e)))
+        
+        # 3. if errors, report back 
+        if file_errors:
+            import warnings
+            msgs = "; ".join([f"{p}: {m}" for p, m in file_errors])
+            warnings.warn(f"Some files couldn't be deleted: {msgs}")
+            
+        # 4. del record from sample table
         cur.execute("DELETE FROM samples WHERE id = ?", (sample.id,))
         self.con.commit()
         rc = cur.rowcount
