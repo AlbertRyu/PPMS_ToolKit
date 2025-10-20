@@ -6,9 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PySide6](https://img.shields.io/badge/GUI-PySide6-green.svg)](https://doc.qt.io/qtforpython/)
 
-*A comprehensive Python toolkit for PPMS (Physical Property Measurement System) data analysis*
+*A  Python toolkit for PPMS (Physical Property Measurement System) data analysis*
 
-[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Screenshots](#-screenshots)
+[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation)
 
 </div>
 
@@ -52,35 +52,6 @@
 - **Data Filtering**
   - Multi-column filtering in measurement tables
   - Filter by sample, mode, field, temperature, or condition
-
-### 🐍 Python Library
-
-```python
-from ppms_toolkit.sample import Sample
-from ppms_toolkit.measurement import VSMMeasurement, HeatCapacityMeasurement
-
-# Create a sample
-sample = Sample(name="Fe3O4", mass=2.5, orientation="IP")
-
-# Load VSM measurement
-vsm = VSMMeasurement(
-    filepath="path/to/data.dat",
-    sample=sample,
-    mode="MT"
-)
-
-# Plot and analyze
-vsm.plot()
-fig, ax, Tc, FWHM = vsm.fit_MT(left=290, right=310, peak_pos=300)
-
-# Heat capacity analysis
-hc = HeatCapacityMeasurement(
-    filepath="path/to/hc.dat",
-    sample=sample,
-    field_strength=1000
-)
-fig, ax, params = hc.background_subtraction_debye()
-```
 
 ---
 
@@ -339,38 +310,6 @@ The toolkit uses SQLite for data management with two main tables:
 - `original_filepath`, `data_filepath`, `processed_data_filepath`
 - `content_hash` (for deduplication)
 - `extra_parameters` (JSON), `comment`, `created_at`
-
----
-
-## 🖼️ Screenshots
-
-### Main Window
-*Sample management and measurement plotting interface*
-
-### Interactive Plotting
-*Click legend items to show/hide curves*
-
-### Batch Import
-*Import multiple .dat files at once*
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Setup
-
-```bash
-# Clone and install in development mode
-git clone https://github.com/AlbertRyu/PPMS_ToolKit.git
-cd PPMS_ToolKit
-pip install -e ".[gui]"
-
-# Run tests (if available)
-pytest tests/
-```
-
 ---
 
 ## 📄 License
@@ -382,14 +321,6 @@ You are free to use, modify, and distribute this software, provided that:
 - You do not hold the author liable for any damages
 
 See [LICENSE](LICENSE) file for full details.
-
----
-
-## 👤 Author
-
-**Yunxiao LIU**
-- Email: yunxiao.liu@tum.de
-- GitHub: [@AlbertRyu](https://github.com/AlbertRyu)
 
 ---
 
