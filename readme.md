@@ -53,35 +53,6 @@
   - Multi-column filtering in measurement tables
   - Filter by sample, mode, field, temperature, or condition
 
-### 🐍 Python Library
-
-```python
-from ppms_toolkit.sample import Sample
-from ppms_toolkit.measurement import VSMMeasurement, HeatCapacityMeasurement
-
-# Create a sample
-sample = Sample(name="Fe3O4", mass=2.5, orientation="IP")
-
-# Load VSM measurement
-vsm = VSMMeasurement(
-    filepath="path/to/data.dat",
-    sample=sample,
-    mode="MT"
-)
-
-# Plot and analyze
-vsm.plot()
-fig, ax, Tc, FWHM = vsm.fit_MT(left=290, right=310, peak_pos=300)
-
-# Heat capacity analysis
-hc = HeatCapacityMeasurement(
-    filepath="path/to/hc.dat",
-    sample=sample,
-    field_strength=1000
-)
-fig, ax, params = hc.background_subtraction_debye()
-```
-
 ---
 
 ## 🚀 Installation
