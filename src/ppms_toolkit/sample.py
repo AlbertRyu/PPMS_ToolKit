@@ -5,7 +5,6 @@
 import pickle
 import os
 from datetime import date
-from typing import Optional
 from multiprocessing import Pool, set_start_method
 
 import pandas as pd

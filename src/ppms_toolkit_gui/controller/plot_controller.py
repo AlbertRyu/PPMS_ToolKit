@@ -1,10 +1,5 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
-
-from random import sample
-from tabnanny import check
-
-from traitlets import This
 from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox
