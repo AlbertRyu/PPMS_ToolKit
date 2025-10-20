@@ -6,9 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PySide6](https://img.shields.io/badge/GUI-PySide6-green.svg)](https://doc.qt.io/qtforpython/)
 
-*A comprehensive Python toolkit for PPMS (Physical Property Measurement System) data analysis*
+*A  Python toolkit for PPMS (Physical Property Measurement System) data analysis*
 
-[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Screenshots](#-screenshots)
+[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation)
 
 </div>
 
@@ -339,38 +339,6 @@ The toolkit uses SQLite for data management with two main tables:
 - `original_filepath`, `data_filepath`, `processed_data_filepath`
 - `content_hash` (for deduplication)
 - `extra_parameters` (JSON), `comment`, `created_at`
-
----
-
-## 🖼️ Screenshots
-
-### Main Window
-*Sample management and measurement plotting interface*
-
-### Interactive Plotting
-*Click legend items to show/hide curves*
-
-### Batch Import
-*Import multiple .dat files at once*
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Setup
-
-```bash
-# Clone and install in development mode
-git clone https://github.com/AlbertRyu/PPMS_ToolKit.git
-cd PPMS_ToolKit
-pip install -e ".[gui]"
-
-# Run tests (if available)
-pytest tests/
-```
-
 ---
 
 ## 📄 License
