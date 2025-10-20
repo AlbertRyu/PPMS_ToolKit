@@ -26,7 +26,7 @@ class NewMeasurementDialog(QDialog):
         # Which Sample
         self.sample_combo = QComboBox()
         for sample in self._samples:
-            self.sample_combo.addItem(f'{sample.name}-{sample.mass}mg', userData=sample.id)
+            self.sample_combo.addItem(f'{sample.name}-{sample.orientation}-{sample.mass}mg', userData=sample.id)
 
         # File list section (supports batch import)
         self.file_list = QListWidget()
