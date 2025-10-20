@@ -31,7 +31,8 @@ class ProjectDialog(QDialog):
 
 
         file_row = QHBoxLayout()
-        self.file_edit = QLineEdit(placeholderText='Select your folder')
+        self.file_edit = QLineEdit()
+        self.file_edit.setPlaceholderText('Select your folder')
         
         if last_dir and Path(last_dir).is_dir():
             self.file_edit.setText(last_dir)  # 启动时填充
@@ -70,7 +71,7 @@ class ProjectDialog(QDialog):
         
         folder = self.file_edit.text().strip()
         if not folder:
-            QMessageBox.critical(None, 
+            QMessageBox.critical(self, 
                                 "Fatal Error", 
                                 "You have to choose a directory to continue.",
                                 buttons= QMessageBox.StandardButton.Ok)

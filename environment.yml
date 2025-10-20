@@ -3,16 +3,26 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python>=3.9
-  - pip
-  # 科学计算核心库
-  - numpy>=1.21
-  - scipy>=1.7
-  - pandas>=1.3
-  - matplotlib>=3.4
-  # GUI 相关
-  - pyarrow>=10.0  # parquet 文件读写
-  # 开发工具（可选）
-  - ipykernel  # Jupyter 支持
+  # Python 版本（3.12 性能更好，支持周期更长）
+  - python=3.12.0
+  
+  # 包管理工具
+  - pip=23.3.1
+  
+  # 科学计算核心库（版本确保兼容 Python 3.12）
+  - numpy=1.26.2      # >= 1.26.0 支持 Python 3.12
+  - scipy=1.11.4      # >= 1.11.2 支持 Python 3.12
+  - pandas=2.1.4      # >= 2.1.0 支持 Python 3.12
+  - matplotlib=3.8.2  # >= 3.8.0 支持 Python 3.12
+  
+  # 数据存储
+  - pyarrow=14.0.1    # Parquet 文件读写
+  
+  # 开发工具
+
+  
+  # 通过 pip 安装的包（conda 版本可能不稳定）
   - pip:
-      - PySide6>=6.4  # Qt6 GUI 框架（conda-forge 的版本可能有问题，用 pip 安装更稳定）
+      - PySide6==6.7.2  # Qt6 GUI 框架（>= 6.5.0 支持 Python 3.12）  
+      - ipykernel==6.27.1  # Jupyter Notebook 支持
+      - ipython==8.18.1    # 增强交互式 shell

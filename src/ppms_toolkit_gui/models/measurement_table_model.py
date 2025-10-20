@@ -36,12 +36,19 @@ class MeasurementTableModel(QAbstractTableModel):
         # First Columns is the checkable column shows which measurement is selected.
         if col == 0:
             if role == Qt.ItemDataRole.CheckStateRole:
-                checked = self._checked_by_id.get(measurement.id, False)
+                mid = getattr(measurement, "id", None)
+                if mid is None:
+                    # Measurement has no ID, treat as unchecked
+                    raise ValueError("Some measurement has no id.")
+                else:
+                    checked = self._checked_by_id.get(mid, False)
                 return Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
             if role == Qt.ItemDataRole.DisplayRole:
                 return None
-        
-        condition = measurement.extra_parameters.get('condition', None)
+        if measurement.extra_parameters is not None:
+            condition = measurement.extra_parameters.get('condition', None)
+        else:
+            condition = None
         sample = self.sample_by_id[measurement.sample_id]
         if role == Qt.ItemDataRole.DisplayRole:
             return [
