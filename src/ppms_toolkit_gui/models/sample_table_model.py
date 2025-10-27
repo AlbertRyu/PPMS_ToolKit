@@ -8,7 +8,7 @@ class SampleTableModel(QAbstractTableModel):
     def __init__(self, samples):
         super().__init__()
         self.samples = samples
-        self.headers = ["Load", "Name", "Mass", "Chemical","Orientation", "Created", "Note"]
+        self.headers = ["Name", "Mass", "Chemical","Orientation", "Created", "Note"]
         self._checked_by_id: dict[int, bool] = {}
         # Initially all is unchecked.
         for s in self.samples:
@@ -26,6 +26,7 @@ class SampleTableModel(QAbstractTableModel):
         sample = self.samples[index.row()]
         col = index.column()
 
+        '''
         # First Columns is the checkable column shows which sample is loaded.
         if col == 0:
             if role == Qt.ItemDataRole.CheckStateRole:
@@ -33,6 +34,7 @@ class SampleTableModel(QAbstractTableModel):
                 return Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
             if role == Qt.ItemDataRole.DisplayRole:
                 return None
+        '''
             
         if role == Qt.ItemDataRole.DisplayRole:
             return [
@@ -42,16 +44,20 @@ class SampleTableModel(QAbstractTableModel):
                 sample.orientation,
                 sample.created_at,
                 sample.notes,
-            ][col - 1]
+            ][col]
         else:
             return None
-        
+    
+    '''
     def flags(self, index: QModelIndex): # Set the first columns checkable
         base_flags = super().flags(index)
         if index.column() == 0:
             return base_flags | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled
         else:
             return base_flags
+    
+
+
     
     def setData(self, index: QModelIndex | QPersistentModelIndex, value: Any, /, role: int = Qt.ItemDataRole.EditRole) -> bool:
         if index.column() == 0 and role == Qt.ItemDataRole.CheckStateRole:
@@ -66,6 +72,7 @@ class SampleTableModel(QAbstractTableModel):
                 return True
             return False
         return False
+    '''
 
     def headerData(self, section, orientation, role: int = Qt.ItemDataRole.DisplayRole):
         # Set how the headers are shown.

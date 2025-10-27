@@ -19,7 +19,8 @@ class SampleTabWidget(QWidget):
         samples = db.list_samples() #Read the samples from db
 
         # Add a search box
-        self.search = QLineEdit(placeholderText='Search Sample Name or Comment')
+        self.search = QLineEdit()
+        self.search.setPlaceholderText('Search Sample Name or Comment')
         
         # Add a table
         self.table = QTableView()
@@ -32,10 +33,12 @@ class SampleTabWidget(QWidget):
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table.resizeColumnsToContents()
         header = self.table.horizontalHeader()
+        '''
         header.resizeSection(0, 35) 
         for col in range(1, header.count()):
             w = header.sectionSize(col)
             header.resizeSection(col, w + 15)
+        '''
         header.setStretchLastSection(True)
         
         # Add button bar
