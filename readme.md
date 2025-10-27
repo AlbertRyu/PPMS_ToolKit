@@ -19,10 +19,10 @@
 **PPMS Toolkit** is a modern, user-friendly application designed for researchers working with Quantum Design's Physical Property Measurement System (PPMS). It provides both a powerful **GUI application** and a flexible **Python library** for:
 
 - 📂 **Data Management**: Import, organize, and manage PPMS `.dat` files with SQLite database
-- 📊 **Interactive Plotting**: Visualize VSM and Heat Capacity measurements with Matplotlib
-- 🔬 **Advanced Analysis**: Curie temperature fitting, background subtraction, susceptibility analysis
+- 📊 **Interactive Plotting**: Visualize VSM ~~and Heat Capacity measurements~~ with Matplotlib
+- ~~🔬 **Advanced Analysis**: Curie temperature fitting, background subtraction, susceptibility analysis~~
 - 💾 **Efficient Storage**: Parquet-based file format for fast data loading and minimal disk usage
-- 🎨 **Modern GUI**: Built with PySide6 (Qt6) for cross-platform compatibility
+- 🎨 **Cross-Platform**: Built with PySide6 (Qt6) for cross-platform compatibility
 
 ---
 
@@ -40,7 +40,7 @@
   - Support for VSM (Vibrating Sample Magnetometer) measurements:
     - **MH mode**: Magnetization vs. Field
     - **MT mode**: Magnetization vs. Temperature
-  - Support for Heat Capacity measurements
+  - ~~Support for Heat Capacity measurements~~
   - Automatic deduplication based on file content hash
 
 - **Interactive Plotting**
@@ -92,13 +92,6 @@ pip install -e ".[gui]"
 # Launch the GUI
 ppms-toolkit
 ```
-
-### Option 3: Library Only (No GUI)
-
-```bash
-pip install -e .
-```
-
 ---
 
 ## 🎯 Quick Start
@@ -130,41 +123,6 @@ pip install -e .
    - Use legend to toggle curves
    - Toggle χ/Moment view with checkbox
 
-### Python Library Example
-
-```python
-from ppms_toolkit.sample import Sample
-from ppms_toolkit.measurement import VSMMeasurement
-
-# Create sample
-sample = Sample(
-    name="Mn-PEA",
-    mass=1.88,  # mg
-    orientation="IP",
-    chemical="(C6H5CH2CH2NH3)2MnCl4"
-)
-
-# Load VSM measurement
-vsm = VSMMeasurement(
-    filepath="data/MT_100Oe.dat",
-    sample=sample,
-    mode="MT",
-    comment="Field cooling"
-)
-
-# Quick plot
-vsm.plot()
-
-# Fit Curie temperature
-fig, ax, Tc, FWHM = vsm.fit_MT(
-    left=285,      # Left boundary of fitting region
-    right=295,     # Right boundary
-    peak_pos=290   # Initial guess for peak
-)
-print(f"Curie Temperature: {Tc:.2f} K")
-print(f"FWHM: {FWHM:.3f} K")
-```
-
 ---
 
 ## 📊 Supported Measurement Types
@@ -173,26 +131,8 @@ print(f"FWHM: {FWHM:.3f} K")
 
 | Mode | Description | Analysis Tools |
 |------|-------------|----------------|
-| **MH** | Magnetization vs. Field | `fit_MH()` - Coercivity extraction |
-| **MT** | Magnetization vs. Temperature | `fit_MT()` - Curie temperature fitting |
-
-**Features:**
-- Automatic susceptibility calculation (χ = M/H)
-- Gaussian fitting for phase transitions
-- Background subtraction and detrending
-
-### Heat Capacity
-
-| Feature | Description |
-|---------|-------------|
-| **Background Subtraction** | Debye/Einstein model fitting |
-| **Phonon Contribution** | Remove lattice contributions |
-| **Temperature Range** | Automatic range detection |
-
-**Available Models:**
-- `debye_model`: Simple Debye model
-- `debye_model_extended`: Multi-component Debye + constant
-- `einstein_model`: Einstein oscillator model
+| **MH** | Magnetization vs. Field | ~~`fit_MH()` - Coercivity extraction～～~~ |
+| **MT** | Magnetization vs. Temperature | ~~`fit_MT()` - Curie temperature fitting~~|
 
 ---
 
@@ -249,54 +189,6 @@ PPMS_ToolKit/
 
 ## 📚 Documentation
 
-### Key Classes
-
-#### `Sample`
-Represents a physical sample with metadata and associated measurements.
-
-```python
-sample = Sample(
-    name="Sample1",
-    mass=2.5,           # mg
-    orientation="IP",   # In-plane or "OOP" (out-of-plane)
-    chemical="Fe3O4"
-)
-```
-
-#### `VSMMeasurement`
-VSM measurement with analysis tools.
-
-```python
-vsm = VSMMeasurement(
-    filepath="data.dat",
-    sample=sample,
-    mode="MT",           # "MT" or "MH"
-    comment="Field cooling"
-)
-
-# Analysis methods
-vsm.plot()                                    # Plot χ vs T/H
-vsm.plot_magnetisation()                      # Plot M vs T/H
-fig, ax, Tc, FWHM = vsm.fit_MT(285, 295, 290) # Fit Curie temp
-fig, ax = vsm.fit_MH()                        # Fit coercivity
-```
-
-#### `HeatCapacityMeasurement`
-Heat capacity measurement with background subtraction.
-
-```python
-hc = HeatCapacityMeasurement(
-    filepath="hc.dat",
-    sample=sample,
-    field_strength=1000  # Oe
-)
-
-# Background subtraction
-fig, ax, params = hc.background_subtraction_debye(
-    mask_func=lambda T: (T > 5) & (T < 50)
-)
-```
-
 ### Database Structure
 
 The toolkit uses SQLite for data management with two main tables:
@@ -329,21 +221,6 @@ See [LICENSE](LICENSE) file for full details.
 - Built with [PySide6](https://doc.qt.io/qtforpython/) (Qt for Python)
 - Data storage powered by [Apache Arrow](https://arrow.apache.org/) (Parquet format)
 - Scientific computing with [NumPy](https://numpy.org/), [SciPy](https://scipy.org/), and [pandas](https://pandas.pydata.org/)
-
----
-
-## 📝 Citation
-
-If you use this toolkit in your research, please cite:
-
-```bibtex
-@software{liu2025ppms,
-  author = {Liu, Yunxiao},
-  title = {PPMS Toolkit: A Python Toolkit for PPMS Data Analysis},
-  year = {2025},
-  url = {https://github.com/AlbertRyu/PPMS_ToolKit}
-}
-```
 
 ---
 
