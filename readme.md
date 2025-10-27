@@ -122,6 +122,22 @@ ppms-toolkit
    - Click "Add Measurement"
    - Select multiple `.dat` files (batch import supported)
    - Choose the sample and measurement mode (MH/MT)
+   
+   #### 📁 File Naming for MT Mode
+   
+   The toolkit automatically detects measurement conditions from filenames:
+   
+   | Filename Contains | Detected Condition |
+   |-------------------|-------------------|
+   | `ZFC` (case-insensitive) | Zero Field Cooling |
+   | `FC` (case-insensitive) | Field Cooling |
+   | Neither | Unknown Condition |
+   
+   **Examples:**
+   ```bash
+   ✅ sample_ZFC_100Oe.dat  → Condition: ZFC
+   ✅ data_FC.dat           → Condition: FC
+   ⚠️ measurement.dat       → Condition: Unknown
 
 5. **Visualize Data**
    - Select measurements from the table
