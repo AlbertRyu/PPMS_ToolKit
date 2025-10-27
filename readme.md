@@ -23,7 +23,6 @@
 ## 📖 Overview
 
 ![Easy plot with Measurement List](screenshots/plot_window.png)
-*Easy plot with Measurement List*
 
 **PPMS Toolkit** is a modern, user-friendly application designed for researchers working with Quantum Design's Physical Property Measurement System (PPMS). It provides both a powerful **GUI application** and a flexible **Python library** for:
 
