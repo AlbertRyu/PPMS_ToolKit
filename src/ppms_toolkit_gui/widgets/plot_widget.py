@@ -93,6 +93,6 @@ class PlotWidget(QWidget):
 
 
         main_layout = QHBoxLayout(self)
-        main_layout.addLayout(file_control_layout)
+        main_layout.addLayout(file_control_layout,5)
         main_layout.addWidget(vline)
-        main_layout.addLayout(plot_layout)
+        main_layout.addLayout(plot_layout,5)

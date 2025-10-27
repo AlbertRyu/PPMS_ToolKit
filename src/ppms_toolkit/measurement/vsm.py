@@ -118,7 +118,7 @@ class VSMMeasurement(Measurement):
                     f'with {self.sample.orientation or "Unknown"} orientation '
                     f'at {self.const_temp}K')
         
-    def plot(self, ax=None):
+    def plot(self, mid=None, ax=None):
         
         if ax is None:
             fig, ax = plt.subplots()
@@ -126,10 +126,10 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi'), label = f'{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi'), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi'), label = f'{self.const_temp}K - {self.sample.orientation or "Unknown Ori"}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi'), label = f'{mid}-{self.const_temp}K - {self.sample.orientation or "Unknown Ori"}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')

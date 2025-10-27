@@ -160,11 +160,11 @@ class PlotController:
 
             vsm = self._measurement_cache[mid]
             if self.view.if_chi.checkState()== Qt.CheckState.Checked:
-                vsm.plot(ax=self.view.canvas.ax)
+                vsm.plot(mid, ax=self.view.canvas.ax)
                 #for line in self.view.canvas.ax.lines:
                     #print(line)
             else:
-                vsm.plot_magnetisation(ax=self.view.canvas.ax)
+                vsm.plot_magnetisation(mid, ax=self.view.canvas.ax)
             
 
         legend = self.view.canvas.ax.legend()
