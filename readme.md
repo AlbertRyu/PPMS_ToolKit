@@ -1,5 +1,11 @@
 # PPMS Toolkit
 
+> ⚠️ **Development Notice**
+>
+> This project is currently under active development and primarily developed and tested on **macOS**.
+> It is a **pure Python** application built with **Qt (PySide6)**, so it should be *cross-platform* in principle.
+> However, minor GUI display issues may occur on **Windows** or **Linux** systems.
+
 <div align="center">
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
