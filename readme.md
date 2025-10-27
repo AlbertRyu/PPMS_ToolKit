@@ -22,6 +22,9 @@
 
 ## 📖 Overview
 
+![Easy plot with Measurement List](screenshots/plot_window.png)
+*Easy plot with Measurement List*
+
 **PPMS Toolkit** is a modern, user-friendly application designed for researchers working with Quantum Design's Physical Property Measurement System (PPMS). It provides both a powerful **GUI application** and a flexible **Python library** for:
 
 - 📂 **Data Management**: Import, organize, and manage PPMS `.dat` files with SQLite database
@@ -122,7 +125,7 @@ ppms-toolkit
    - Click "Add Measurement"
    - Select multiple `.dat` files (batch import supported)
    - Choose the sample and measurement mode (MH/MT)
-   
+
    #### 📁 File Naming for MT Mode
    
    The toolkit automatically detects measurement conditions from filenames:
