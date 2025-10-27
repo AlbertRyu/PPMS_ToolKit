@@ -135,7 +135,7 @@ class VSMMeasurement(Measurement):
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         ax.set_ylabel('Susceptibility (emu)')
-        ax.set_title(f'{self.mode} - {self.sample_name}')
+        #ax.set_title(f'{self.mode} - {self.sample_name}')
 
         ax.legend()
 
@@ -158,7 +158,7 @@ class VSMMeasurement(Measurement):
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         ax.set_ylabel('Moment (emu / gram)')
-        ax.set_title(f'{self.mode} - {self.sample_name}')
+        #ax.set_title(f'{self.mode} - {self.sample_name}')
 
         ax.legend()
 
