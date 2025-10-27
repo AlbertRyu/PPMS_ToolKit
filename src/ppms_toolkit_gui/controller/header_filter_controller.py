@@ -91,7 +91,7 @@ class HeaderFilterController:
         for val in values:
             it = QListWidgetItem(str(val))
             it.setFlags(it.flags() | Qt.ItemFlag.ItemIsUserCheckable)
-            checked = (current_allowed is None) or (val in current_allowed)
+            checked = (current_allowed is not None) and (val in current_allowed)
             it.setCheckState(Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked)
             it.setData(Qt.ItemDataRole.UserRole, val)
             lst.addItem(it)
@@ -121,8 +121,13 @@ class HeaderFilterController:
                 it = lst.item(i)
                 if it.checkState() == Qt.CheckState.Checked:
                     selected.add(it.data(Qt.ItemDataRole.UserRole))
-            
-            self.proxy.set_allowed_values(logical_index, selected if len(selected) != len(values) else None)
+
+                    # 如果没有勾选任何项，设为 None（显示全部）
+            # 如果勾选了部分项，设为选中的集合（只显示这些）
+            if len(selected) == 0:
+                self.proxy.set_allowed_values(logical_index, None)
+            else:
+                self.proxy.set_allowed_values(logical_index, selected)
             menu.close()
             
         def do_cancel():
