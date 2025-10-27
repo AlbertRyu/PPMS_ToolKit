@@ -39,6 +39,8 @@ class PlotController:
         self.view.button_add.clicked.connect(self.add_measurement)
         self.view.button_plot.clicked.connect(self._on_plot_clicked)
         self.view.button_del.clicked.connect(self.del_measurements)
+        self.view.button_select_all.clicked.connect(self._on_select_all)       # 新增
+        self.view.button_deselect_all.clicked.connect(self._on_deselect_all)   # 新增
 
 
     def add_measurement(self):
@@ -209,3 +211,24 @@ class PlotController:
         if not hasattr(self, '_legend_pick_connected'):
             self.view.canvas.canvas.mpl_connect('pick_event', on_pick)
             self._legend_pick_connected = True
+
+    def _on_select_all(self):
+        """选中所有可见（未被过滤）的行"""
+        proxy = self.view.table.model()  # MultiValueFilterProxy
+        source_model = proxy.sourceModel()  # MeasurementTableModel
+        
+        # 获取所有可见行在源模型中的行号
+        visible_source_rows = []
+        for proxy_row in range(proxy.rowCount()):
+            proxy_index = proxy.index(proxy_row, 0)
+            source_index = proxy.mapToSource(proxy_index)
+            if source_index.isValid():
+                visible_source_rows.append(source_index.row())
+        
+        # 调用模型的 select_all_visible 方法
+        source_model.select_all_visible(visible_source_rows)
+
+    def _on_deselect_all(self):
+        """取消选中所有行"""
+        source_model = self.view.model  # MeasurementTableModel
+        source_model.deselect_all()

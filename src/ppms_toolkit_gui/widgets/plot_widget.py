@@ -43,11 +43,24 @@ class PlotWidget(QWidget):
         self.if_chi.setCheckState(Qt.CheckState.Checked)
         self.if_chi.setStatusTip('Checked to plot suceptbity, otherwise moment')
 
+        self.button_select_all = QPushButton('Select All')
+        self.button_select_all.setStatusTip('Select all visible measurements')
+
+        self.button_deselect_all = QPushButton('Deselect All')
+        self.button_deselect_all.setStatusTip('Deselect all measurements')
+
+
         button_holder = QHBoxLayout()
+
         button_holder.addWidget(self.button_add)
         button_holder.addWidget(self.button_del)
         button_holder.addWidget(self.button_plot)
         button_holder.addWidget(self.if_chi)
+
+        button_holder_up = QHBoxLayout()
+        button_holder_up.addWidget(self.button_select_all)    # 新增
+        button_holder_up.addWidget(self.button_deselect_all)
+        button_holder_up.addStretch() 
 
         # The Measurement Table
         self.table = QTableView()
@@ -75,6 +88,8 @@ class PlotWidget(QWidget):
         file_control_layout = QVBoxLayout()
         file_control_layout.addWidget(title_label)
         file_control_layout.addWidget(self.table)
+        file_control_layout.addLayout(button_holder_up)
+
         file_control_layout.addLayout(button_holder)
         file_control_layout.setContentsMargins(10,10,10,10)
 

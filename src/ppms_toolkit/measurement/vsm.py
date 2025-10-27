@@ -141,7 +141,7 @@ class VSMMeasurement(Measurement):
 
         return ax
     
-    def plot_magnetisation(self, ax=None):
+    def plot_magnetisation(self, mid=None, ax=None):
         
         if ax is None:
             fig, ax = plt.subplots()
@@ -149,10 +149,10 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{self.const_field}Oe - {self.condition} - {self.sample.orientation}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{self.const_temp}K - {self.sample.orientation}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{mid}-{self.const_temp}K - {self.sample.orientation}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')

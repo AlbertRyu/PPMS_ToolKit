@@ -110,3 +110,38 @@ class MeasurementTableModel(QAbstractTableModel):
     def get_checked_meansurement_ids(self) -> list:
         """Return list of measurement ids that are currently checked (in arbitrary order)."""
         return [mid for mid, v in self._checked_by_id.items() if v]
+    
+    def select_all_visible(self, visible_rows: list[int]):
+        """
+        选中所有可见行（未被过滤隐藏的行）
+        
+        Args:
+            visible_rows: 可见行的行号列表（从 proxy model 传递）
+        """
+        changed_any = False
+        for row in visible_rows:
+            if 0 <= row < len(self.measurements):
+                measurement = self.measurements[row]
+                mid = measurement.id
+                if mid and not self._checked_by_id.get(mid, False):
+                    self._checked_by_id[mid] = True
+                    changed_any = True
+        
+        if changed_any:
+            # 通知视图刷新所有行的第一列
+            top_left = self.index(0, 0)
+            bottom_right = self.index(len(self.measurements) - 1, 0)
+            self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.CheckStateRole])
+
+    def deselect_all(self):
+        """取消选中所有行"""
+        changed_any = False
+        for mid in self._checked_by_id:
+            if self._checked_by_id[mid]:
+                self._checked_by_id[mid] = False
+                changed_any = True
+        
+        if changed_any:
+            top_left = self.index(0, 0)
+            bottom_right = self.index(len(self.measurements) - 1, 0)
+            self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.CheckStateRole])
