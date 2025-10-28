@@ -140,7 +140,7 @@ class HeaderFilterController:
         x = header.sectionPosition(logical_index)
         pt = header.mapToGlobal(QPoint(x, header.height()))
         font_metrics = QFontMetrics(self.table.font())
-        min_width = font_metrics.horizontalAdvance("M") * 30  # 约 30 个字符宽度
+        min_width = font_metrics.horizontalAdvance("M") * 25  # 约 30 个字符宽度
         menu.setFixedWidth(max(min_width, header.sectionSize(logical_index)))
         menu.popup(pt)
 
