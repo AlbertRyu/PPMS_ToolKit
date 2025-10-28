@@ -78,12 +78,10 @@ class PlotWidget(QWidget):
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         # 设置样式：加大字体、加粗
-        title_label.setStyleSheet("""
-            QLabel {
-                font-size: 18px;
-                font-weight: bold;
-            }
-        """)
+        font = title_label.font()
+        font.setPointSize(font.pointSize() + 4)  # 相对于系统默认字体
+        font.setBold(True)
+        title_label.setFont(font)
 
         file_control_layout = QVBoxLayout()
         file_control_layout.addWidget(title_label)
