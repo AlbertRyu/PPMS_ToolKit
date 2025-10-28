@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QListWidget, QPushButton, QWidgetAction, QListWidgetItem
 )
 from PySide6.QtCore import Qt, QPoint
+from PySide6.QtGui import QFontMetrics
 
 from ..proxy.multi_value_filter import MultiValueFilterProxy
 
@@ -138,7 +139,9 @@ class HeaderFilterController:
 
         x = header.sectionPosition(logical_index)
         pt = header.mapToGlobal(QPoint(x, header.height()))
-        menu.setFixedWidth(max(270,header.sectionSize(logical_index)))
+        font_metrics = QFontMetrics(self.table.font())
+        min_width = font_metrics.horizontalAdvance("M") * 30  # 约 30 个字符宽度
+        menu.setFixedWidth(max(min_width, header.sectionSize(logical_index)))
         menu.popup(pt)
 
 
