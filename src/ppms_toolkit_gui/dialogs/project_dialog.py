@@ -20,7 +20,8 @@ class ProjectDialog(QDialog):
 
         self.setWindowTitle('Welcome to PPMS Toolkit')
         self.setContentsMargins(20, 10, 20, 10)
-        self.setFixedSize(500,180)
+        self.setMinimumSize(400,150)
+        self.adjustSize()
 
         self.label = QLabel('choose a working directory to start using       :)')
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)       # 水平垂直居中
