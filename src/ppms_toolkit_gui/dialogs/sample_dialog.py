@@ -85,8 +85,9 @@ class SampleDialog(QDialog):
         elif ori == "Out of Plane":
             self.ori_OOP.setChecked(True)
 
-        self.date_edit.setDate(QDate.fromString(sample.created_at))
+        self.date_edit.setDate(QDate.fromString(sample.created_at, "yyyy-MM-dd"))
         self.notes_edit.setPlainText(sample.notes or '')
+
     def _on_accept(self):
         # Check if every value exist.
         if not self.name_edit.text():
