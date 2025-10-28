@@ -29,14 +29,18 @@ class SampleDialog(QDialog):
         form_layout = QFormLayout(self)
 
         # Name Row
-        self.name_edit = QLineEdit(placeholderText="Sample Name")
+        self.name_edit = QLineEdit()
+        self.name_edit.setPlaceholderText("Sample Name")
         
         # Mass Row
-        self.mass_spin = QDoubleSpinBox(suffix=" mg", value=1)
+        self.mass_spin = QDoubleSpinBox()
+        self.mass_spin.setSuffix('mg')
+        self.mass_spin.setValue(1)
         self.mass_spin.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
 
         # Chemical Row
-        self.chemical_edit = QComboBox(editable=True)
+        self.chemical_edit = QComboBox()
+        self.chemical_edit.setEditable(True)
         self.chemical_edit.addItem('')
         self.chemical_edit.addItems(self.db.fetch_all_distinct_chemical())
 
