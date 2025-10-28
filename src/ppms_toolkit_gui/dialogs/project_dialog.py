@@ -47,7 +47,7 @@ class ProjectDialog(QDialog):
 
         self.button_confirm = QPushButton('Confirm')
         self.button_confirm.clicked.connect(self._on_confirm)
-        self.button_confirm.setFixedWidth(120)
+        #self.button_confirm.setFixedWidth(120)
         self.button_confirm.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
         main_layout = QVBoxLayout(self)
