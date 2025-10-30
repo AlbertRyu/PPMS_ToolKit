@@ -121,7 +121,7 @@ class VSMMeasurement(Measurement):
     def plot(self, mid=None, ax=None):
         
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(dpi=300)
 
         df = self.dataframe
         print(type(df.filter(regex='chi').squeeze()))
@@ -145,7 +145,7 @@ class VSMMeasurement(Measurement):
     def plot_magnetisation(self, mid=None, ax=None):
         
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(dpi=300)
 
         df = self.dataframe
 

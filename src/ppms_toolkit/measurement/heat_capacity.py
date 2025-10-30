@@ -101,7 +101,7 @@ class HeatCapacityMeasurement(Measurement):
     def plot(self, ax):
         '''Create a standard plot of Heat Capacity Measurement'''
         if ax is None:
-            fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+            fig, ax = plt.subplots(1, 2, figsize=(12, 4),dpi=300)
 
         cols = self.dataframe.columns
         sample_T = cols[cols.str.contains(r'Sample Temp \(')][0]
