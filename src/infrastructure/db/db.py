@@ -23,6 +23,20 @@ def _sha256_of_file(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+def _to_relative_path(absolute_path: Path, base_path: Path) -> str:
+    """将绝对路径转为相对于 base_path 的相对路径"""
+    try:
+        return str(absolute_path.relative_to(base_path))
+    except ValueError:
+        # 如果路径不在 base_path 下，返回绝对路径（兼容性）
+        return str(absolute_path)
+
+def _to_absolute_path(relative_path: str, base_path: Path) -> Path:
+    """将相对路径转为绝对路径"""
+    p = Path(relative_path)
+    if p.is_absolute():
+        return p  # 已经是绝对路径，直接返回
+    return base_path / p  # 拼接成绝对路径
 
 @dataclass(frozen=True)
 class SampleDTO:
@@ -182,7 +196,7 @@ class LocalDB:
             for fp in (data_fp, proc_fp):
                 if fp:
                     try:
-                        p = Path(fp)
+                        p = _to_absolute_path(fp, self.project_root)
                         if p.exists():
                             p.unlink()
                     except Exception as e:
@@ -244,8 +258,8 @@ class LocalDB:
                 mode=row[4],
                 const_temperature=row[5],
                 const_field=row[6],
-                data_filepath=row[7],
-                processed_data_filepath=row[8],
+                data_filepath=str(_to_absolute_path(row[7],self.project_root)) if row[7] else None,
+                processed_data_filepath=str(_to_absolute_path(row[7],self.project_root)) if row[8] else None,
                 extra_parameters=extra,  # ✅ 反序列化后的 dict
                 comment=row[10],
                 created_at=row[11],
@@ -343,8 +357,8 @@ class LocalDB:
              dto.const_temperature,
              dto.const_field,
              dto.original_filepath,
-             str(raw_parquet_path),
-             str(processed_parquet_path),
+             _to_relative_path(raw_parquet_path, self.project_root),
+             _to_relative_path(processed_parquet_path, self.project_root),
              _serialize_data(dto.extra_parameters),
              dto.comment,
              now,
@@ -374,7 +388,7 @@ class LocalDB:
         for p in (data_fp, proc_fp):
             if p:
                 try:
-                    ppath = Path(p)
+                    ppath = _to_absolute_path(p, self.project_root)
                     if ppath.exists():
                         ppath.unlink()
                 except Exception as e:
@@ -402,3 +416,68 @@ class LocalDB:
     def close(self):
         self.con.close()
 
+    def migrate_paths_to_relative(self):
+        cursor = self.con.cursor()
+        
+        # 1. 获取所有 measurements
+        rows = cursor.execute(
+            "SELECT id, data_filepath, processed_data_filepath FROM measurements"
+        ).fetchall()
+        
+        if not rows:
+            print("No measurements to migrate.")
+            return
+        
+        # 2. 统计和转换
+        total = len(rows)
+        updated = 0
+        errors = []
+        
+        print(f"Found {total} measurements to check...")
+        
+        for row in rows:
+            mid, data_fp, proc_fp = row
+            
+            # 检查是否已经是相对路径
+            data_path = Path(data_fp) if data_fp else None
+            proc_path = Path(proc_fp) if proc_fp else None
+            
+            # 如果已经是相对路径，跳过
+            if data_path and not data_path.is_absolute() and proc_path and not proc_path.is_absolute():
+                continue
+            
+            # 转换为相对路径
+            try:
+                new_data_fp = _to_relative_path(data_path, self.project_root) if data_path else None
+                new_proc_fp = _to_relative_path(proc_path, self.project_root) if proc_path else None
+                
+                # 更新数据库
+                cursor.execute(
+                    "UPDATE measurements SET data_filepath = ?, processed_data_filepath = ? WHERE id = ?",
+                    (new_data_fp, new_proc_fp, mid)
+                )
+                updated += 1
+                print(f"✅ Migrated measurement {mid}:")
+                print(f"   {data_fp} → {new_data_fp}")
+                print(f"   {proc_fp} → {new_proc_fp}")
+                
+            except Exception as e:
+                errors.append((mid, str(e)))
+                print(f"❌ Failed to migrate measurement {mid}: {e}")
+        
+        # 3. 提交更改
+        if updated > 0:
+            try:
+                self.con.commit()
+                print(f"\n🎉 Successfully migrated {updated}/{total} measurements.")
+            except Exception as e:
+                self.con.rollback()
+                print(f"\n❌ Migration failed, rolled back: {e}")
+                raise
+        else:
+            print("\n✨ All paths are already relative, no migration needed.")
+        
+        if errors:
+            print(f"\n⚠️ Errors occurred for {len(errors)} measurements:")
+            for mid, err in errors:
+                print(f"   - Measurement {mid}: {err}")
