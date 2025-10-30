@@ -124,12 +124,13 @@ class VSMMeasurement(Measurement):
             fig, ax = plt.subplots()
 
         df = self.dataframe
+        print(type(df.filter(regex='chi').squeeze()))
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi'), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi').squeeze(), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi'), label = f'{mid}-{self.const_temp}K - {self.sample.orientation or "Unknown Ori"}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi').squeeze(), label = f'{mid}-{self.const_temp}K - {self.sample.orientation or "Unknown Ori"}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
@@ -149,10 +150,10 @@ class VSMMeasurement(Measurement):
         df = self.dataframe
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='Moment'), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='^Moment'), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation}')
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='Moment'), label = f'{mid}-{self.const_temp}K - {self.sample.orientation}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='^Moment'), label = f'{mid}-{self.const_temp}K - {self.sample.orientation}')
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')

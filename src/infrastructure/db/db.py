@@ -259,7 +259,7 @@ class LocalDB:
                 const_temperature=row[5],
                 const_field=row[6],
                 data_filepath=str(_to_absolute_path(row[7],self.project_root)) if row[7] else None,
-                processed_data_filepath=str(_to_absolute_path(row[7],self.project_root)) if row[8] else None,
+                processed_data_filepath=str(_to_absolute_path(row[8],self.project_root)) if row[8] else None,
                 extra_parameters=extra,  # ✅ 反序列化后的 dict
                 comment=row[10],
                 created_at=row[11],
