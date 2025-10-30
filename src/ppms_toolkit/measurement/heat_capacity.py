@@ -25,15 +25,19 @@ plt.rcParams['axes.grid'] = True  # Would like every plot to have grid
 class HeatCapacityMeasurement(Measurement):
     def __init__(self,
                  filepath: str,
-                 sample: Optional["Sample"] = None,
+                 sample: "Sample",
                  sample_mass: float = 1,
-                 field_strength: float = 0.0,
+                 field_strength: float = 0,
                  comment: str = "",
                  metadata=None
                  ):
         self.field_strength = field_strength
         self.sample_mass = sample_mass
-        super().__init__(filepath, sample, sample_mass, comment, metadata)
+        super().__init__(
+            filepath=filepath, 
+            sample=sample,
+            comment= comment,
+            metadata= metadata)
         if sample:  # If sample is inputted, add this mesurement in the sample.
             sample.add_measurement(self)
 
@@ -53,13 +57,14 @@ class HeatCapacityMeasurement(Measurement):
                 "instance": self
         }
 
-    def process_data(self, raw_df) -> pd.DataFrame:
+    def process_data(self, raw_df, filepath) -> pd.DataFrame:
         import re
         # Remove the comment lines.
         df = raw_df[raw_df['Comment ()'] == '']
         
         # Remove the error Code, fix the corrupted error code.
-        df.columns = [col.replace('�', 'µ') for col in df.columns]
+        # Keep columns as an Index so we can access the `.str` accessor.
+        df.columns = df.columns.astype(str).str.replace('�', 'µ', regex=False)
         # Convert all str into Floats
 
         pattern = (     r'Time Stamp \(|'
@@ -71,8 +76,8 @@ class HeatCapacityMeasurement(Measurement):
                 )
 
 
-        cols = df.columns
-        keys_to_keep = cols[cols.str.contains(pattern)]
+        # Use Index.str.contains directly on the columns Index.
+        keys_to_keep = df.columns[df.columns.str.contains(pattern)]
         df = df[keys_to_keep]
         df = df.apply(pd.to_numeric, errors='coerce')
         
@@ -93,9 +98,11 @@ class HeatCapacityMeasurement(Measurement):
 
         return df
 
-    def plot(self):
+    def plot(self, ax):
         '''Create a standard plot of Heat Capacity Measurement'''
-        fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+        if ax is None:
+            fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+
         cols = self.dataframe.columns
         sample_T = cols[cols.str.contains(r'Sample Temp \(')][0]
         sample_HC = cols[cols.str.contains(r'Samp HC \(')][0]
@@ -103,18 +110,22 @@ class HeatCapacityMeasurement(Measurement):
      
         # The first graph is a Samp HC v.s. T
         ax[0].scatter(x=self.dataframe[sample_T],
-                      y=self.dataframe[sample_HC])
+                      y=self.dataframe[sample_HC],
+                      label=f'{self.field_strength} Oe',
+                      s=5)
         ax[0].set_xlabel(sample_T)
         ax[0].set_ylabel(sample_HC)
+        ax[0].legend()
 
         ax[1].scatter(x=self.dataframe[sample_T],
-                      y=self.dataframe[sample_HC_over_T])
+                      y=self.dataframe[sample_HC_over_T],
+                      s=5,
+                      label=f'{self.field_strength} Oe')
         ax[1].set_xlabel(sample_T)
         ax[1].set_ylabel(sample_HC_over_T)
+        ax[1].legend()
 
-        fig.suptitle(f'{self.sample_name} under {self.field_strength} Oe')
-
-        return fig, ax
+        return ax
 
     def background_subtraction(self,
                                mask_func=lambda T: T > 0,
