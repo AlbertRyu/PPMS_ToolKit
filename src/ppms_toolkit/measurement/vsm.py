@@ -118,47 +118,36 @@ class VSMMeasurement(Measurement):
                     f'with {self.sample.orientation or "Unknown"} orientation '
                     f'at {self.const_temp}K')
         
-    def plot(self, mid=None, ax=None):
-        
+    def plot(self, mid=None, ax=None, susceptibility=True, legend = 'Sample Name' ):
+
         if ax is None:
             fig, ax = plt.subplots(dpi=300)
+
+        if legend == 'Exp Setting':
+            label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}' 
+        elif legend == 'Sample Name':
+            label = f'{self.sample.name}'
+
+        if susceptibility:
+            regex = 'chi'
+            ax.set_ylabel('Susceptibility (emu)')
+        else:
+            regex = '^Moment'
+            ax.set_ylabel('Moment (emu / gram)')
 
         df = self.dataframe
         print(type(df.filter(regex='chi').squeeze()))
 
         if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='chi').squeeze(), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}')
+            ax.plot(df.filter(regex='^Temperature'), df.filter(regex=regex).squeeze(), label = label)
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='chi').squeeze(), label = f'{mid}-{self.const_temp}K - {self.sample.orientation or "Unknown Ori"}')
+            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex=regex).squeeze(), label = label)
             ax.set_xlabel('Magnetic Field(Oe)')
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         ax.set_ylabel('Susceptibility (emu)')
-        #ax.set_title(f'{self.mode} - {self.sample_name}')
-
-        ax.legend()
-
-        return ax
-    
-    def plot_magnetisation(self, mid=None, ax=None):
-        
-        if ax is None:
-            fig, ax = plt.subplots(dpi=300)
-
-        df = self.dataframe
-
-        if self.mode == 'MT':
-            ax.plot(df.filter(regex='^Temperature'), df.filter(regex='^Moment'), label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation}')
-            ax.set_xlabel('Temperature(K)')
-        elif self.mode == 'MH':
-            ax.plot(df.filter(regex='Magnetic Field'), df.filter(regex='^Moment'), label = f'{mid}-{self.const_temp}K - {self.sample.orientation}')
-            ax.set_xlabel('Magnetic Field(Oe)')
-        else:
-            print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
-        
-        ax.set_ylabel('Moment (emu / gram)')
         #ax.set_title(f'{self.mode} - {self.sample_name}')
 
         ax.legend()

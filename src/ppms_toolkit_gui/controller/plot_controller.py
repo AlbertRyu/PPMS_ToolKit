@@ -1,8 +1,9 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
+from operator import le
 from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
-from PySide6.QtWidgets import QDialog, QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox, QRadioButton
 from PySide6.QtCore import Qt
 
 from typing import TYPE_CHECKING
@@ -161,13 +162,17 @@ class PlotController:
                     continue
 
             vsm = self._measurement_cache[mid]
-            if self.view.if_chi.checkState()== Qt.CheckState.Checked:
-                vsm.plot(mid, ax=self.view.canvas.ax)
-                #for line in self.view.canvas.ax.lines:
-                    #print(line)
-            else:
-                vsm.plot_magnetisation(mid, ax=self.view.canvas.ax)
-            
+
+            # Get selected radio button.
+            for rb in self.view.legend_mode.findChildren(QRadioButton):
+                if rb.isChecked():
+                    legend = rb.text()
+                
+            vsm.plot(mid, 
+                     ax=self.view.canvas.ax,
+                     susceptibility =(self.view.if_chi.checkState()== Qt.CheckState.Checked),
+                     legend=legend)
+
 
         legend = self.view.canvas.ax.legend()
         if legend:
