@@ -4,14 +4,16 @@ from operator import le
 from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox, QRadioButton
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSortFilterProxyModel
 
-from typing import TYPE_CHECKING
+
+from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from ..widgets.plot_widget import PlotWidget
 
 from ppms_toolkit.measurement import VSMMeasurement
 from infrastructure.db.db import LocalDB, MeasurementDTO, SampleDTO
+from ..models.measurement_table_model import MeasurementTableModel
 
 class PlotController:
     def __init__(self, db: LocalDB, view: 'PlotWidget', ) -> None:
@@ -219,8 +221,8 @@ class PlotController:
 
     def _on_select_all(self):
         """选中所有可见（未被过滤）的行"""
-        proxy = self.view.table.model()  # MultiValueFilterProxy
-        source_model = proxy.sourceModel()  # MeasurementTableModel
+        proxy = cast(QSortFilterProxyModel, self.view.table.model()) # MultiValueFilterProxy
+        source_model = cast(MeasurementTableModel, proxy.sourceModel()) # MeasurementTableModel
         
         # 获取所有可见行在源模型中的行号
         visible_source_rows = []
