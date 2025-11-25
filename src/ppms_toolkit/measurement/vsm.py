@@ -142,7 +142,6 @@ class VSMMeasurement(Measurement):
             ax.set_ylabel('Moment (emu / gram)')
 
         df = self.dataframe
-        print(type(df.filter(regex='chi').squeeze()))
 
         if self.mode == 'MT':
             ax.plot(df.filter(regex='^Temperature'), df.filter(regex=regex).squeeze(), label = label)
@@ -154,8 +153,6 @@ class VSMMeasurement(Measurement):
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         ax.set_ylabel('Susceptibility (emu)')
-        #ax.set_title(f'{self.mode} - {self.sample_name}')
-
         ax.legend()
 
         return ax
