@@ -164,15 +164,17 @@ class PlotController:
 
             vsm = self._measurement_cache[mid]
 
+            legend_mode: str | None = None
             # Get selected radio button.
             for rb in self.view.legend_mode.findChildren(QRadioButton):
                 if rb.isChecked():
                     legend = rb.text()
-                
+            
+                            
             vsm.plot(mid, 
                      ax=self.view.canvas.ax,
                      susceptibility =(self.view.if_chi.checkState()== Qt.CheckState.Checked),
-                     legend=legend)
+                     legend=legend_mode)
 
 
         legend = self.view.canvas.ax.legend()
