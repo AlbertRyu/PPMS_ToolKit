@@ -134,16 +134,14 @@ class VSMMeasurement(Measurement):
         else:
             raise ValueError("Legend Mode is not set")
 
-        if susceptibility:
-            regex = 'chi'
-            ax.set_ylabel('Susceptibility (emu)')
-        else:
-            regex = '^Moment'
-            ax.set_ylabel('Moment (emu / gram)')
-
         df = self.dataframe
 
+        regex = '^Moment'
+        ax.set_ylabel('Moment (emu / gram)')
         if self.mode == 'MT':
+            if susceptibility:
+                regex = 'chi'
+                ax.set_ylabel('Susceptibility (emu)')
             ax.plot(df.filter(regex='^Temperature'), df.filter(regex=regex).squeeze(), label = label)
             ax.set_xlabel('Temperature(K)')
         elif self.mode == 'MH':
@@ -152,7 +150,7 @@ class VSMMeasurement(Measurement):
         else:
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
-        ax.set_ylabel('Susceptibility (emu)')
+        #ax.set_ylabel('Susceptibility (emu)')
         ax.legend()
 
         return ax
