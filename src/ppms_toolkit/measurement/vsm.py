@@ -157,12 +157,6 @@ class VSMMeasurement(Measurement):
 
         return ax
 
-    '''
-    def get_df_by_field(df, field):
-        m = df[df['const field'] == field]['instance'].values[0]
-        df = m.dataframe.sort_values('Temperature (K)')
-        return df
-    '''
 
     def fit_MH(self):
         fig, ax = plt.subplots(1,2, figsize=(16,5))

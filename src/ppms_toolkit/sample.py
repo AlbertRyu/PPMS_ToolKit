@@ -173,15 +173,14 @@ class Sample:
                 f'{self.mass}mg, '
                 f'made in {date}.')
     
-    def plot_vsm(self, mode, orientation = None, ax=None, field=None, temperature=None, condition=None, yaxis = None):
+
+    ## This function is not quite useful.
+    def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, yaxis = None):
 
         if not ax:
             fig ,ax = plt.subplots()
 
         df = self.measurements_vsm
-
-
-        mask_orient = df['orientation'] == orientation if orientation else True
 
         if mode:
             mask_mode = df['mode'] == mode
@@ -199,7 +198,7 @@ class Sample:
             mask_temp = True
 
 
-        df_filtered = df[mask_field & mask_mode & mask_temp & mask_orient]
+        df_filtered = df[mask_field & mask_mode & mask_temp]
         for index, row in df_filtered.iterrows():
                 if condition:
                     if row['instance'].condition == condition:
