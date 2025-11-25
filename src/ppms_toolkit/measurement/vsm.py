@@ -123,10 +123,16 @@ class VSMMeasurement(Measurement):
         if ax is None:
             fig, ax = plt.subplots(dpi=300)
 
+        label: str|None = None
         if legend == 'Exp Setting':
-            label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}' 
+            if self.mode == 'MH':
+                label = f'{mid}-{self.const_temp}K' 
+            elif self.mode == "MT":
+                label = f'{mid}-{self.const_field}Oe - {self.condition} - {self.sample.orientation or "Unknown Ori"}' 
         elif legend == 'Sample Name':
             label = f'{self.sample.name}'
+        else:
+            raise ValueError("Legend Mode is not set")
 
         if susceptibility:
             regex = 'chi'
