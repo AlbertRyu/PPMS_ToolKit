@@ -1,6 +1,5 @@
 # This Widget Connects the GUI and backend processing.
 # Signal Control heißt das.
-from operator import le
 from ppms_toolkit.sample import Sample
 from ..dialogs.new_measurement_dialog import NewMeasurementDialog
 from PySide6.QtWidgets import QDialog, QMessageBox, QRadioButton
@@ -12,7 +11,7 @@ if TYPE_CHECKING:
     from ..widgets.plot_widget import PlotWidget
 
 from ppms_toolkit.measurement import VSMMeasurement
-from infrastructure.db.db import LocalDB, MeasurementDTO, SampleDTO
+from infrastructure.db.db import LocalDB, MeasurementDTO 
 from ..models.measurement_table_model import MeasurementTableModel
 
 class PlotController:
