@@ -27,13 +27,14 @@ class Sample:
     ----------
     name : str
         Name of the sample.
-    mass : float, optional
-        Mass of the sample, unit is mg.
     id   : float, optional
         Assign a unique id to the sample.
+    orientation : str
+        either "In Plane" or "Out of Plane"
+    mass : float, optional
+        Mass of the sample, unit is mg.
     make_date: str
         make date of the sample, in "%Y-%m-%d" format.
-
 
     Attributes
     ----------
