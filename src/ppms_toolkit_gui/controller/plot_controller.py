@@ -168,7 +168,7 @@ class PlotController:
             # Get selected radio button.
             for rb in self.view.legend_mode.findChildren(QRadioButton):
                 if rb.isChecked():
-                    legend = rb.text()
+                    legend_mode = rb.text()
             
                             
             vsm.plot(mid, 
