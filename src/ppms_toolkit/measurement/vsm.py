@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter, detrend
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d #,PchipInterpolator,UnivariateSpline
-from .utils import gauss_with_step, gauss
+
+from .utils import gauss
 
 if TYPE_CHECKING:
     from ppms_toolkit.sample import Sample  # Avoid Cylic-Import
@@ -64,7 +65,7 @@ class VSMMeasurement(Measurement):
         '''Return a dict for representation purpose'''
         return {
                 "mode":      getattr(self, "mode", None),
-                "orientation":getattr(self, "sample_orientation", None),
+                #"orientation":getattr(self, "sample_orientation", None),
                 "const temp": getattr(self, "const_temp", None),
                 "const field": getattr(self, "const_field", None),
                 "instance": self
@@ -156,40 +157,63 @@ class VSMMeasurement(Measurement):
         return ax
 
 
-    def fit_MH(self):
+    def fit_MH(self, fit_window = [0,70000], window_length=101, p0=None):
+        """
+        from M(H) curve, do dM/dH gussian fit, to extract:
+        - x0_fit: Peak Position (Oe)
+        - FWHM : Full Width Half Maximum (Oe)
+        also return fig, ax
+        """
+
         fig, ax = plt.subplots(1,2, figsize=(16,5))
 
-        mask1 = self.dataframe['Magnetic Field (Oe)'] < 70000
-        mask2 = self.dataframe['Magnetic Field (Oe)'] > 0
-        this_df = self.dataframe[mask1 & mask2]
+        df = self.dataframe
 
-        Moment = this_df['Moment (emu)']
-        ExtField = this_df['Magnetic Field (Oe)']
+        field_col = "Magnetic Field (Oe)"
+        moment_col = "Moment (emu)"
+
+        mask_field = (df[field_col] > fit_window[0]) & (df[field_col] < fit_window[1])
+        this_df = df.loc[mask_field].copy()
+
+        if this_df.empty:
+            raise ValueError("fit_MH: No datapoint in desired fit_window")
+
+        # Transform into Numpy Array
+        ExtField = this_df[field_col].to_numpy()
+        Moment   = this_df[moment_col].to_numpy()
 
         dMdH = np.gradient(Moment, ExtField)
 
         dMdH_detrended = detrend(dMdH)
         base_y = dMdH - dMdH_detrended
-        dMdH_detrended_filtered = savgol_filter(dMdH_detrended, 101, 3)
+
+        if window_length >= len(dMdH_detrended):
+            # 选一个最大可能的奇数窗
+            window_length = max(3, len(dMdH_detrended) // 2 * 2 + 1)
+        dMdH_detrended_filtered = savgol_filter(dMdH_detrended, window_length, polyorder=3)
 
         mask = (dMdH > 0) & (10000 < ExtField)
         x_fit = ExtField[mask]
         y_fit = dMdH_detrended_filtered[mask]
 
         # 3) 给出初始猜测 p0
-        A0     = y_fit.max() - y_fit.min()    # 峰高
-        x00    = x_fit.iloc[np.argmax(y_fit)]      # 峰位
-        sigma0 = (x_fit.max() - x_fit.min())/6  # 大致半宽
-        c0     = y_fit.min()                   # 底线
-        p0 = [A0, x00, sigma0, c0]
+        if p0 is None:
+            A0     = y_fit.max() - y_fit.min()    # 峰高
+            max_idx = int(np.argmax(y_fit))
+            x00    = float(x_fit[max_idx])      # 峰位
+            sigma0 = (x_fit.max() - x_fit.min())/6  # 大致半宽
+            c0     = y_fit.min()                   # 底线
+            p0 = [A0, x00, sigma0, c0]
 
         # 4) 拟合
         popt, pcov = curve_fit(gauss, x_fit, y_fit, p0=p0)
         A_fit, x0_fit, sigma_fit, c_fit = popt
+        sigma_fit = abs(sigma_fit)
+        FWHM = 2 * np.sqrt(2 * np.log(2)) * sigma_fit
 
         ax[0].scatter(ExtField, dMdH_detrended_filtered, s=1, label= 'Detrended Filtered Data')
         ax[0].plot(ExtField, gauss(ExtField, *popt), '-', lw=2, label='Guassian fit',color='g')
-        ax[0].axvline(x0_fit, color='r', ls='--', label=f'Peak @ {x0_fit:.0f} Oe, FWHM = {2 * np.sqrt(2 * np.log(2)) * sigma_fit:.0f}')
+        ax[0].axvline(x0_fit, color='r', ls='--', label=f'Peak @ {x0_fit:.0f} Oe, FWHM = {FWHM}')
         ax[0].legend()
         
         ax[1].scatter(ExtField, dMdH, s=1, label = 'OG Data')
@@ -198,63 +222,87 @@ class VSMMeasurement(Measurement):
         
         fig.suptitle(f'dMdH, T = {self.const_temp}')
 
-        return fig, ax
+        return x0_fit, FWHM, fig, ax
         
 
 
-    def fit_MT(self, left, right, peak_pos):
+    def fit_MT(self, 
+               fit_func, 
+               fit_window:list, 
+               p0=None,
+               detrended:bool = True,
+               smooth_window:int = 101,
+               deriv_smooth_window:int = 31
+               ):
+
         field = self.const_field
         this_df = self.dataframe
         
         chi = this_df['chi']
         Temp = this_df['Temperature (K)']
 
-        f_interp = interp1d(Temp, chi, kind='linear', bounds_error=False, fill_value="extrapolate") # type: ignore[arg-type]
+        # --- 1. 等间距插值 & 平滑 χ(T) -----------------------------------
+        f_interp = interp1d(
+            Temp,
+            chi,
+            kind="linear",
+            bounds_error=False,
+            fill_value="extrapolate")# type: ignore[arg-type]
+
         # 生成等间距 T_new
         T_new = np.linspace(np.min(Temp), np.max(Temp), 2000)
         chi_resampled = f_interp(T_new)
-        chi_resampled_smooth = savgol_filter(chi_resampled, window_length=21, polyorder=3)
 
+        # 窗口必须是奇数且 < 数据长度
+        smooth_window = min(smooth_window, len(T_new) // 2 * 2 + 1)
+        chi_smooth = savgol_filter(chi_resampled, window_length=smooth_window, polyorder=3)
 
-        dchidT = np.gradient(chi_resampled_smooth, T_new)
+        # Take gradient
+        dchidT = np.gradient(chi_smooth, T_new)
 
         mask = np.isfinite(dchidT) 
         dchidT_clean = dchidT[mask]
         T_new_clean = T_new[mask]
-        
-        # dchidT_clean = dchidT_clean[mask]
-        # T_new_clean = T_new_clean[mask]
 
-        dchidT_detrended = detrend(dchidT_clean)
+        # --- 3. 去趋势 & 再平滑 -------------------------------------------
+        if detrended:
+            dchidT_trend_removed = detrend(dchidT_clean)
+        else:
+            dchidT_trend_removed = dchidT_clean.copy()
 
-        base_y = dchidT_clean - dchidT_detrended
-        dchidT_detrended_filtered = savgol_filter(dchidT_detrended, 31, 3)
+        base_y = dchidT_clean - dchidT_trend_removed
+        deriv_smooth_window = min(deriv_smooth_window,
+                              len(dchidT_trend_removed) // 2 * 2 + 1)
+        dchidT_detrended_filtered = savgol_filter(dchidT_trend_removed, deriv_smooth_window, 3)
+
         
+        left, right = fit_window
         mask = (T_new_clean > left) & (T_new_clean<right)
         x_fit = T_new_clean[mask]
         y_fit = dchidT_detrended_filtered[mask]
 
-        # 3) 给出初始猜测 p0
-        A0     = y_fit.max() - y_fit.min()    # 峰高
-        x00    = peak_pos     # 峰位
-        sigma0 = (x_fit.max() - x_fit.min())/6  # 大致半宽
-        sigma1 = (x_fit.max() - x_fit.min())/6
-        c0     = y_fit.min()                   # 底线
-        p0 = [A0, x00, sigma0, sigma1, c0]
+            # --- 5. 初始猜测 p0（如果未给） -----------------------------------
+        if p0 is None:
+            A0 = float(y_fit.max() - y_fit.min())
+            # 粗略峰位：拟合区内最大值
+            x00 = float(x_fit[np.argmax(y_fit)])
+            sigma0 = float((x_fit.max() - x_fit.min()) / 6)
+            c0 = float(y_fit.min())
+            p0 = [A0, x00, sigma0, c0]
 
         # 4) 拟合
-        popt, pcov = curve_fit(gauss_with_step, x_fit, y_fit, p0=p0)
+        popt, pcov = curve_fit(fit_func, x_fit, y_fit, p0=p0)
 
-        A_fit, x0_fit, sigma_fit, sigma_R, c_fit = popt
+        A_fit, x0_fit, sigma_fit, c_fit = popt
 
         FWHM = 2 * np.sqrt(2 * np.log(2)) * sigma_fit
 
-
         # 5) 作图验证
         fig, ax = plt.subplots(1,2,figsize=(12,5))
+
         ax[0].plot(T_new_clean, dchidT_detrended_filtered, '.', ms=3, alpha=0.5, label='data')
         ax[0].plot(x_fit, y_fit, '.', ms=5, label='fit region')
-        ax[0].plot(T_new_clean, gauss_with_step(T_new_clean, *popt), '-', lw=2, label='Guassian fit')
+        ax[0].plot(T_new_clean, fit_func(T_new_clean, *popt), '-', lw=2, label='Guassian fit')
         ax[0].axvline(x0_fit, color='r', ls='--', label=f'Peak @ {x0_fit:.2f} T, FWHM = {FWHM:.3f}')
         ax[0].set_title(f'Field = {field} Oe')
         ax[0].set_xlabel('Temperature(K)')
@@ -263,7 +311,7 @@ class VSMMeasurement(Measurement):
 
         ax[1].scatter(T_new_clean, dchidT_clean,s=1, label='original')
         ax[1].plot(T_new_clean, base_y, label='linear background')
-        ax[1].scatter(T_new_clean,dchidT_detrended, label='Detrended',s=1)
+        ax[1].scatter(T_new_clean,dchidT_trend_removed, label='Detrended',s=1)
         ax[1].scatter(T_new_clean,dchidT_detrended_filtered, label='Detrended+Filtered',s=1)
         ax[1].set_xlabel('Temperature (K)')
         ax[1].set_ylabel('dchi/dT (emu/K)')
