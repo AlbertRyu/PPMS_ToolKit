@@ -98,7 +98,7 @@ class HeatCapacityMeasurement(Measurement):
 
         return df
 
-    def plot(self, ax):
+    def plot(self, ax=None):
         '''Create a standard plot of Heat Capacity Measurement'''
         if ax is None:
             fig, ax = plt.subplots(1, 2, figsize=(12, 4),dpi=300)
@@ -108,10 +108,9 @@ class HeatCapacityMeasurement(Measurement):
         sample_HC = cols[cols.str.contains(r'Samp HC \(')][0]
      
         # The first graph is a Samp HC v.s. T
-        ax.scatter(x=self.dataframe[sample_T],
-                      y=self.dataframe[sample_HC],
-                      label=f'{self.field_strength} Oe',
-                      s=5)
+        ax.plot(self.dataframe[sample_T],
+                self.dataframe[sample_HC],
+                label=f'{self.field_strength} Oe',)
         ax.set_xlabel(sample_T)
         ax.set_ylabel(sample_HC)
         ax.legend()
