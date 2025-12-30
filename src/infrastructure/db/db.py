@@ -134,8 +134,8 @@ class LocalDB:
 
         cur.execute("""
         SELECT id, name FROM samples
-        WHERE chemical = ? AND ABS(mass - ?) < 1e-6
-        """, (sample.chemical, sample.mass))
+        WHERE chemical = ? AND name = ? AND ABS(mass - ?) < 1e-6
+        """, (sample.chemical, sample.name, sample.mass))
         dup = cur.fetchall()
         if dup:
             dup_names = [d[1] for d in dup]

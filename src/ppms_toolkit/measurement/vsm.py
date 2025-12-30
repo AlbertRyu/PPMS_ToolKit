@@ -119,7 +119,7 @@ class VSMMeasurement(Measurement):
                     f'with {self.sample.orientation or "Unknown"} orientation '
                     f'at {self.const_temp}K')
         
-    def plot(self, mid=None, ax=None, susceptibility=True, legend = 'Sample Name' ):
+    def plot(self, mid=None, ax=None, susceptibility=True, legend = 'Exp Setting' ):
 
         if ax is None:
             fig, ax = plt.subplots(dpi=300)
