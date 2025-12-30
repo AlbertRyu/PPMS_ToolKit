@@ -106,24 +106,15 @@ class HeatCapacityMeasurement(Measurement):
         cols = self.dataframe.columns
         sample_T = cols[cols.str.contains(r'Sample Temp \(')][0]
         sample_HC = cols[cols.str.contains(r'Samp HC \(')][0]
-        sample_HC_over_T = cols[cols.str.contains(r'Samp HC\/Temp \(')][0]
      
         # The first graph is a Samp HC v.s. T
-        ax[0].scatter(x=self.dataframe[sample_T],
+        ax.scatter(x=self.dataframe[sample_T],
                       y=self.dataframe[sample_HC],
                       label=f'{self.field_strength} Oe',
                       s=5)
-        ax[0].set_xlabel(sample_T)
-        ax[0].set_ylabel(sample_HC)
-        ax[0].legend()
-
-        ax[1].scatter(x=self.dataframe[sample_T],
-                      y=self.dataframe[sample_HC_over_T],
-                      s=5,
-                      label=f'{self.field_strength} Oe')
-        ax[1].set_xlabel(sample_T)
-        ax[1].set_ylabel(sample_HC_over_T)
-        ax[1].legend()
+        ax.set_xlabel(sample_T)
+        ax.set_ylabel(sample_HC)
+        ax.legend()
 
         return ax
 
