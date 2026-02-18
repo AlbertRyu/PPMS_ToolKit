@@ -87,6 +87,17 @@ class Sample:
                 vsm_rows.append(m.to_dict())
         df_vsm = pd.DataFrame(vsm_rows)
         return df_vsm
+    
+    @property
+    def measurements_mh(self):
+        '''Represent all MH imeasurement list as pd.Dataframe'''
+        vsm_rows = []
+        for m in self._measurements:
+            if isinstance(m, VSMMeasurement):
+                if m.mode == 'MH':
+                    vsm_rows.append(m.to_dict())
+        df_vsm = pd.DataFrame(vsm_rows)
+        return df_vsm
 
     @property
     def measurements_hc(self):
