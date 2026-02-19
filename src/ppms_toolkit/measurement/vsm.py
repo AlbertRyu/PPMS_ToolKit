@@ -119,7 +119,7 @@ class VSMMeasurement(Measurement):
                     f'with {self.sample.orientation or "Unknown"} orientation '
                     f'at {self.const_temp}K')
         
-    def plot(self, mid=None, ax=None, susceptibility=True, legend = 'Exp Setting' ):
+    def plot(self, mid=None, ax=None, susceptibility=True, legend: str|list = 'Exp Setting' ):
 
         if ax is None:
             fig, ax = plt.subplots(dpi=300)
@@ -132,8 +132,11 @@ class VSMMeasurement(Measurement):
                 label = f'{self.const_field}Oe {self.condition} {self.sample.orientation or "Unknown Ori"} {mid if mid else ''}' 
         elif legend == 'Sample Name':
             label = f'{self.sample.name}'
+        elif type(legend) is list:
+            label = " ".join(str(getattr(self, l)) for l in legend)
         else:
             raise ValueError("Legend Mode is not set")
+
 
         df = self.dataframe
 

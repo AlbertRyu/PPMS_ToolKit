@@ -188,7 +188,7 @@ class Sample:
     
 
     ## This function is not quite useful.
-    def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, susceptibility=True):
+    def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, susceptibility=True, legend: str|list='Exp Setting'):
 
         if not ax:
             fig ,ax = plt.subplots()
@@ -217,7 +217,7 @@ class Sample:
         for index, row in df_filtered.iterrows():
                 if condition:
                     if row['instance'].condition == condition:
-                        row['instance'].plot(ax=ax, susceptibility=susceptibility)
+                        row['instance'].plot(ax=ax, susceptibility=susceptibility, legend=legend)
                 else:
-                        row['instance'].plot(ax=ax, susceptibility=susceptibility)
+                        row['instance'].plot(ax=ax, susceptibility=susceptibility, legend=legend)
 
