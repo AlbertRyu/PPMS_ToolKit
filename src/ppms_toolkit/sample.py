@@ -194,6 +194,8 @@ class Sample:
             fig ,ax = plt.subplots()
 
         df = self.measurements_vsm
+        if mode=='MH':
+            df = self.measurements_vsm.sort_values('const temp')
 
         if mode:
             mask_mode = df['mode'] == mode
