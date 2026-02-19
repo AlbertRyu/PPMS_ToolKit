@@ -152,6 +152,7 @@ class VSMMeasurement(Measurement):
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         #ax.set_ylabel('Susceptibility (emu)')
+        ax.set_title(f'{self.sample.name} {self.mode} {self.sample.orientation if self.sample.orientation else ''}')
         ax.legend()
 
         return ax
