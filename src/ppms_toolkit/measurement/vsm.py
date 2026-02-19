@@ -129,7 +129,7 @@ class VSMMeasurement(Measurement):
             if self.mode == 'MH':
                 label = f'{mid if mid else ''} {self.const_temp:.0f}K' 
             elif self.mode == "MT":
-                label = f'{mid if mid else ''} {self.const_field}Oe {self.condition} {self.sample.orientation or "Unknown Ori"}' 
+                label = f'{self.const_field}Oe {self.condition} {self.sample.orientation or "Unknown Ori"} {mid if mid else ''}' 
         elif legend == 'Sample Name':
             label = f'{self.sample.name}'
         else:

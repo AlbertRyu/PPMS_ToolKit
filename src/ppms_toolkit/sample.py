@@ -86,6 +86,7 @@ class Sample:
             if isinstance(m, VSMMeasurement):
                 vsm_rows.append(m.to_dict())
         df_vsm = pd.DataFrame(vsm_rows)
+        df_vsm =df_vsm.sort_values('const field')
         return df_vsm
     
     @property
@@ -97,6 +98,7 @@ class Sample:
                 if m.mode == 'MH':
                     vsm_rows.append(m.to_dict())
         df_vsm = pd.DataFrame(vsm_rows)
+        df_vsm.sort_values('const temp')
         return df_vsm
 
     @property
