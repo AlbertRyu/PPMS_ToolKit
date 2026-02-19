@@ -188,7 +188,7 @@ class Sample:
     
 
     ## This function is not quite useful.
-    def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, yaxis = None):
+    def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, susceptibility=True):
 
         if not ax:
             fig ,ax = plt.subplots()
@@ -217,14 +217,7 @@ class Sample:
         for index, row in df_filtered.iterrows():
                 if condition:
                     if row['instance'].condition == condition:
-                        if yaxis == 'moment':
-                            row['instance'].plot_magnetisation(ax=ax) 
-                        else:
-                            row['instance'].plot(ax=ax)
-
+                        row['instance'].plot(ax=ax, susceptibility=susceptibility)
                 else:
-                    if yaxis == 'chi':
-                        row['instance'].plot_magnetisation(ax=ax) 
-                    else:
-                        row['instance'].plot(ax=ax)
+                        row['instance'].plot(ax=ax, susceptibility=susceptibility)
 
