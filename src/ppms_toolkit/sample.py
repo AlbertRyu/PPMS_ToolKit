@@ -54,6 +54,9 @@ class Sample:
         self.make_date = \
             date.fromisoformat(make_date) if make_date else None
         self._measurements = []
+        # in Sample.__init__
+        self.phase_points = pd.DataFrame(columns=["source", "temp", "field", "fwhm"])
+
 
     @property
     def measurements(self) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -184,7 +187,130 @@ class Sample:
                 f'{self.name}, '
                 f'{self.mass}mg, '
                 f'made in {date}.')
-            
+    
+
+    def add_phase_point(self, source, x, y, fwhm):
+        self.phase_points.loc[len(self.phase_points)] = [source, x, y, fwhm]
+
+    def plot_phase_diagram(self,
+                           ax=None,
+                           mh_fwhm_cut=5000,
+                           mt_fwhm_cut=10,
+                           xlim=None,
+                           ylim=None,
+                           title=None,
+                           savepath=None,
+                           dpi=300):
+        """
+        Plot phase diagram using notebook-like style.
+
+        phase_points columns:
+        - source: 'MH' or 'MT'
+        - x, y
+        - fwhm
+        """
+        if ax is None:
+            _, ax = plt.subplots()
+
+        df = self.phase_points.copy()
+        if df.empty:
+            raise ValueError("phase_points is empty")
+
+        df["source"] = df["source"].astype(str).str.upper()
+        df = df[df["source"].isin(["MH", "MT"])]
+
+        for col in ("temp", "field", "fwhm"):
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.dropna(subset=["temp", "field", "fwhm"])
+
+        def plot_with_err(sub_df, *, err_axis, color, marker, label):
+            if sub_df.empty:
+                return
+
+            err = sub_df["fwhm"].values / 2.0
+            kwargs = dict(
+                fmt=marker,
+                color=color,
+                ecolor="gray",
+                capsize=5,
+                elinewidth=1.5,
+                alpha=0.8,
+                linestyle="none",
+                label=label,
+            )
+            if err_axis == "y":
+                ax.errorbar(
+                    x=sub_df["temp"].values,
+                    y=sub_df["field"].values,
+                    yerr=err,
+                    **kwargs
+                )
+            else:
+                ax.errorbar(
+                    x=sub_df["temp"].values,
+                    y=sub_df["field"].values,
+                    xerr=err,
+                    **kwargs
+                )
+
+        # MH: x=Temp, y=PeakField, yerr=FWHM/2
+        df_mh = df[df["source"] == "MH"]
+        wide_mh = df_mh["fwhm"] > mh_fwhm_cut
+        narrow_mh = ~wide_mh
+        plot_with_err(
+            df_mh[narrow_mh],
+            err_axis="y",
+            color="tab:green",
+            marker="s",
+            label=f"MH - reliable, width <= {mh_fwhm_cut / 1000:g} kOe",
+        )
+        plot_with_err(
+            df_mh[wide_mh],
+            err_axis="y",
+            color="tab:red",
+            marker="s",
+            label=f"MH - less reliable, width > {mh_fwhm_cut / 1000:g} kOe",
+        )
+
+        # MT: x=PeakTemp, y=Field, xerr=FWHM/2
+        df_mt = df[df["source"] == "MT"]
+        wide_mt = df_mt["fwhm"] > mt_fwhm_cut
+        narrow_mt = ~wide_mt
+        plot_with_err(
+            df_mt[narrow_mt],
+            err_axis="x",
+            color="tab:green",
+            marker="^",
+            label=f"MT - reliable, width <= {mt_fwhm_cut:g} K",
+        )
+        plot_with_err(
+            df_mt[wide_mt],
+            err_axis="x",
+            color="tab:red",
+            marker="^",
+            label=f"MT - less reliable, width > {mt_fwhm_cut:g} K",
+        )
+
+        ax.set_xlabel("Temperature (K)")
+        ax.set_ylabel("Magnetic Field (Oe)")
+        ax.grid(True, linestyle="--", alpha=0.6, which="major")
+        ax.legend()
+
+        if title:
+            ax.set_title(title)
+        else:
+            ax.set_title(f"{self.name} Phase Diagram")
+        if xlim:
+            ax.set_xlim(xlim)
+        if ylim:
+            ax.set_ylim(ylim)
+
+        plt.tight_layout()
+        if savepath:
+            plt.savefig(savepath, dpi=dpi)
+
+        return ax
+
 
     ## This function is not quite useful.
     def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, susceptibility=True, legend: str|list='Exp Setting'):
@@ -219,4 +345,3 @@ class Sample:
                         row['instance'].plot(ax=ax, susceptibility=susceptibility, legend=legend)
                 else:
                         row['instance'].plot(ax=ax, susceptibility=susceptibility, legend=legend)
-

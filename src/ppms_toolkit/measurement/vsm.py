@@ -226,7 +226,7 @@ class VSMMeasurement(Measurement):
         
         fig.suptitle(f'dMdH, T = {self.const_temp}')
 
-        return x0_fit, FWHM, fig, ax
+        return fig, ax, x0_fit, FWHM 
         
 
 
