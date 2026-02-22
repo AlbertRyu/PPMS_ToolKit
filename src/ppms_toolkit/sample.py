@@ -80,26 +80,25 @@ class Sample:
         
     @property
     def measurements_vsm(self):
+        return self.get_measurements_vsm()
+
+    def get_measurements_vsm(self, mode=None):
         '''Represent the measurement list as pd.Dataframe'''
-        vsm_rows = []
-        for m in self._measurements:
-            if isinstance(m, VSMMeasurement):
-                vsm_rows.append(m.to_dict())
-        df_vsm = pd.DataFrame(vsm_rows)
-        df_vsm =df_vsm.sort_values('const field')
-        return df_vsm
-    
-    @property
-    def measurements_mh(self):
-        '''Represent all MH imeasurement list as pd.Dataframe'''
-        vsm_rows = []
-        for m in self._measurements:
-            if isinstance(m, VSMMeasurement):
-                if m.mode == 'MH':
-                    vsm_rows.append(m.to_dict())
-        df_vsm = pd.DataFrame(vsm_rows)
-        df_vsm.sort_values('const temp')
-        return df_vsm
+
+        measurements = (
+            m for m in self._measurements
+            if isinstance(m, VSMMeasurement)
+            and (mode is None or m.mode == mode)
+        )
+        df = pd.DataFrame(m.to_dict() for m in measurements)
+
+        if df.empty:
+            return df
+
+        # 决定排序规则
+        sort_key = 'const temp' if mode == 'MH' else 'const field'
+
+        return df.sort_values(sort_key)
 
     @property
     def measurements_hc(self):
