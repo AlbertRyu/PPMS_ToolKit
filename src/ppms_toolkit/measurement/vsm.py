@@ -196,7 +196,7 @@ class VSMMeasurement(Measurement):
             window_length = max(3, len(dMdH_detrended) // 2 * 2 + 1)
         dMdH_detrended_filtered = savgol_filter(dMdH_detrended, window_length, polyorder=3)
 
-        mask = (dMdH > 0) & (10000 < ExtField)
+        mask = dMdH > 0
         x_fit = ExtField[mask]
         y_fit = dMdH_detrended_filtered[mask]
 

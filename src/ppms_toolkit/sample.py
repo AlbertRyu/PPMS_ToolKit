@@ -184,7 +184,7 @@ class Sample:
                 f'{self.name}, '
                 f'{self.mass}mg, '
                 f'made in {date}.')
-    
+            
 
     ## This function is not quite useful.
     def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, susceptibility=True, legend: str|list='Exp Setting'):
