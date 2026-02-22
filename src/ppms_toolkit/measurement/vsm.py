@@ -122,7 +122,7 @@ class VSMMeasurement(Measurement):
     def plot(self, mid=None, ax=None, susceptibility=True, legend: str|list = 'Exp Setting' ):
 
         if ax is None:
-            fig, ax = plt.subplots(dpi=300)
+            fig, ax = plt.subplots()
 
         label: str|None = None
         if legend == 'Exp Setting':
