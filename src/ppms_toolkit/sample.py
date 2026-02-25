@@ -299,7 +299,7 @@ class Sample:
         if title:
             ax.set_title(title)
         else:
-            ax.set_title(f"{self.name} Phase Diagram")
+            ax.set_title(f"{self.name} {self.orientation} Phase Diagram")
         if xlim:
             ax.set_xlim(xlim)
         if ylim:
