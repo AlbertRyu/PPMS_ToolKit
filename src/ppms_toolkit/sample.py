@@ -8,7 +8,6 @@ from datetime import date
 from multiprocessing import Pool, set_start_method
 
 import pandas as pd
-from IPython.display import display, Markdown
 import matplotlib.pyplot as plt
 
 from .measurement import Measurement,VSMMeasurement,HeatCapacityMeasurement
@@ -65,21 +64,22 @@ class Sample:
         df_hc = self.measurements_hc
         return df_vsm, df_hc
     
-    @property
-    def show_measurements(self):
-        df_vsm = self.measurements_vsm
-        df_hc = self.measurements_hc
-        if df_hc.empty:
-            print("There's no HC measurements bind to this sample.")
-        else:
-            display(Markdown("#### HeatCapacity Measurements List"))
-            display(df_hc)
+    # deprecated function
+    # @property
+    # def show_measurements(self):
+    #     df_vsm = self.measurements_vsm
+    #     df_hc = self.measurements_hc
+    #     if df_hc.empty:
+    #         print("There's no HC measurements bind to this sample.")
+    #     else:
+    #         print("#### HeatCapacity Measurements List")
+    #         print(df_hc)
 
-        if df_vsm.empty:
-            print("There's no VSM measurements bind to this sample.")
-        else:
-            display(Markdown("#### VSM Measurements List"))
-            display(df_vsm)
+    #     if df_vsm.empty:
+    #         print("There's no VSM measurements bind to this sample.")
+    #     else:
+    #         print("#### VSM Measurements List")
+    #         print(df_vsm)
         
     @property
     def measurements_vsm(self):
