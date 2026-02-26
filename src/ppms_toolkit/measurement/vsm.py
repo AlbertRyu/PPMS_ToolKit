@@ -127,7 +127,7 @@ class VSMMeasurement(Measurement):
         label: str|None = None
         if legend == 'Exp Setting':
             if self.mode == 'MH':
-                label = f'{mid if mid else ''} {self.const_temp:.0f}K' 
+                label = f'{mid if mid else ""} {self.const_temp:.0f}K' 
             elif self.mode == "MT":
                 label = f'{self.const_field}Oe {self.condition} {self.sample.orientation or "Unknown Ori"} {mid if mid else ''}' 
         elif legend == 'Sample Name':
