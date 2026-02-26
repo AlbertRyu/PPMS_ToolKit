@@ -129,7 +129,7 @@ class VSMMeasurement(Measurement):
             if self.mode == 'MH':
                 label = f'{mid if mid else ""} {self.const_temp:.0f}K' 
             elif self.mode == "MT":
-                label = f'{self.const_field}Oe {self.condition} {self.sample.orientation or "Unknown Ori"} {mid if mid else ''}' 
+                label = f'{self.const_field}Oe {self.condition} {self.sample.orientation or "Unknown Ori"} {mid if mid else ""}' 
         elif legend == 'Sample Name':
             label = f'{self.sample.name}'
         elif type(legend) is list:
@@ -155,7 +155,7 @@ class VSMMeasurement(Measurement):
             print('Ah oh, something went wrong. Check if measurement.mode is "MH" or "MT".')
         
         #ax.set_ylabel('Susceptibility (emu)')
-        ax.set_title(f'{self.sample.name} {self.mode} {self.sample.orientation if self.sample.orientation else ''}')
+        ax.set_title(f'{self.sample.name} {self.mode} {self.sample.orientation if self.sample.orientation else ""}')
         ax.legend()
 
         return ax
