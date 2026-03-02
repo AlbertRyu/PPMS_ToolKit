@@ -12,3 +12,8 @@ reference_code/
 
 *.egg-info/
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
