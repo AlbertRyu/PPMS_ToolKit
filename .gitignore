@@ -17,3 +17,5 @@ reference_code/
 .DS_Store
 .AppleDouble
 .LSOverride
+
+dist

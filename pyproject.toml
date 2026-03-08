@@ -1,15 +1,19 @@
 [build-system]
-requires = ["setuptools>=64"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
 
 [project]
 name = "PPMS_Toolkit"
-version = "0.2.0"
+version = "0.2.2"
 description = "Toolkit for PPMS data processing"
 authors = [{name="Yunxiao LIU", email="yunxiao.liu@tum.de"}]
 requires-python = ">=3.9"
-license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
 readme = "readme.md"
+license = { file = "LICENSE" }
 
 dependencies = [
     "numpy>=1.21.0",
@@ -17,6 +21,12 @@ dependencies = [
     "matplotlib>=3.4.0",
     "pandas>=1.3.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/AlbertRyu/PPMS_ToolKit"
+Issues = "https://github.com/AlbertRyu/PPMS_ToolKit/issues"
+
+
 
 [project.optional-dependencies]
 gui = [
@@ -27,8 +37,9 @@ gui = [
 [project.scripts]                
 ppms-toolkit = "ppms_toolkit_gui.app:main"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/infrastructure",
+    "src/ppms_toolkit",
+    "src/ppms_toolkit_gui",
+]

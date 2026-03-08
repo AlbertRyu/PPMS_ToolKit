@@ -12,8 +12,13 @@ import sys
 def main():
     app = QApplication(sys.argv)
 
-    # 设置全局应用图标（Windows 任务栏）
-    icon_path = Path(__file__).parent.parent / "resources" / "app_icon.png"
+    if sys.platform == "darwin":
+        icon_file = "app_icon.icns"
+    else:
+        icon_file = "app_icon.png"
+
+    icon_path = Path(__file__).parent / "resources" / icon_file
+
     if icon_path.exists():
         app.setWindowIcon(QIcon(str(icon_path)))
 
