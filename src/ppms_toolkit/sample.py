@@ -172,7 +172,9 @@ class Sample:
         else:
             orientation = self.orientation
 
-        arg_list = [(folder_path + p, orientation) for p in os.listdir(folder_path)]
+        arg_list = [
+            (folder_path + "/" + p, orientation) for p in os.listdir(folder_path)
+        ]
 
         if paralelle:
             with Pool() as pool:
