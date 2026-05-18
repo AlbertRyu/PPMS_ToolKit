@@ -172,8 +172,12 @@ class Sample:
         else:
             orientation = self.orientation
 
+        exclude_keywords = [".DS_Store", "Log"]
+
         arg_list = [
-            (folder_path + "/" + p, orientation) for p in os.listdir(folder_path)
+            (os.path.join(folder_path, p), orientation)
+            for p in os.listdir(folder_path)
+            if not any(keyword.lower() in p.lower() for keyword in exclude_keywords)
         ]
 
         if paralelle:
