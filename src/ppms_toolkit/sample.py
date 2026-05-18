@@ -1,6 +1,4 @@
-'''
-
-'''
+""" """
 
 import pickle
 import os
@@ -10,11 +8,11 @@ from multiprocessing import Pool, set_start_method
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from .measurement import Measurement,VSMMeasurement,HeatCapacityMeasurement
+from .measurement import Measurement, VSMMeasurement, HeatCapacityMeasurement
 
 
 class Sample:
-    '''
+    """
     This modules defined each sample, their properties
     and their supported functions.
 
@@ -40,30 +38,32 @@ class Sample:
     measurements: list
         a list of measurements assigned to this sample.
      All the parameters.
-    '''
-    def __init__(self, name: str,
-                 id: float | None = None,
-                 orientation: str | None = None,
-                 mass: float | None = None,
-                 make_date: str | None = None):
+    """
+
+    def __init__(
+        self,
+        name: str,
+        id: float | None = None,
+        orientation: str | None = None,
+        mass: float | None = None,
+        make_date: str | None = None,
+    ):
         self.name = name
         self.orientation = orientation
         self.id = id
         self.mass = mass  # milligram
-        self.make_date = \
-            date.fromisoformat(make_date) if make_date else None
+        self.make_date = date.fromisoformat(make_date) if make_date else None
         self._measurements = []
         # in Sample.__init__
         self.phase_points = pd.DataFrame(columns=["source", "temp", "field", "fwhm"])
 
-
     @property
     def measurements(self) -> tuple[pd.DataFrame, pd.DataFrame]:
-        '''Represent the measurement list as dataframes'''
+        """Represent the measurement list as dataframes"""
         df_vsm = self.measurements_vsm
         df_hc = self.measurements_hc
         return df_vsm, df_hc
-    
+
     # deprecated function
     # @property
     # def show_measurements(self):
@@ -80,18 +80,18 @@ class Sample:
     #     else:
     #         print("#### VSM Measurements List")
     #         print(df_vsm)
-        
+
     @property
     def measurements_vsm(self):
         return self.get_measurements_vsm()
 
     def get_measurements_vsm(self, mode=None):
-        '''Represent the measurement list as pd.Dataframe'''
+        """Represent the measurement list as pd.Dataframe"""
 
         measurements = (
-            m for m in self._measurements
-            if isinstance(m, VSMMeasurement)
-            and (mode is None or m.mode == mode)
+            m
+            for m in self._measurements
+            if isinstance(m, VSMMeasurement) and (mode is None or m.mode == mode)
         )
         df = pd.DataFrame(m.to_dict() for m in measurements)
 
@@ -99,35 +99,37 @@ class Sample:
             return df
 
         # 决定排序规则
-        sort_key = 'const temp' if mode == 'MH' else 'const field'
+        sort_key = "const temp" if mode == "MH" else "const field"
 
         return df.sort_values(sort_key)
 
     @property
     def measurements_hc(self):
-        '''Represent the measurement list as pd.Dataframe'''
+        """Represent the measurement list as pd.Dataframe"""
         hc_rows = []
         for m in self._measurements:
             if isinstance(m, HeatCapacityMeasurement):
                 hc_rows.append(m.to_dict())
-        df_hc =pd.DataFrame(hc_rows)
+        df_hc = pd.DataFrame(hc_rows)
         return df_hc
-        
+
     def set_make_date(self, make_date: str):
         self.make_date = date.fromisoformat(make_date)
 
     def add_measurement(self, m: Measurement):
         if m not in self._measurements:
-            print(f'{m} (added)')
+            print(f"{m} (added)")
             self._measurements.append(m)
             m.sample = self  # double-linked with the measurement
         else:
-            print(f'The Measurment [{m}] \n'
-                  f'is already exist in sample [{self}] ')
+            print(f"The Measurment [{m}] \nis already exist in sample [{self}] ")
 
     def save(self):
-        with open(f'{self.name}'
-                  f'({self.make_date if self.make_date else "Unknown MakeTime"}).pkl', "wb") as f:
+        with open(
+            f"{self.name}"
+            f"({self.make_date if self.make_date else 'Unknown MakeTime'}).pkl",
+            "wb",
+        ) as f:
             pickle.dump(self, f)
 
     @staticmethod
@@ -138,39 +140,42 @@ class Sample:
     def _vsm_measurement_reader(self, args):
 
         path, orientation = args
-        if 'MT' in path:
-            mode =  'MT'
-        elif 'MH' in path:
-            mode =  'MH'
+        if "MT" in path:
+            mode = "MT"
+        elif "MH" in path:
+            mode = "MH"
         else:
-            raise ValueError(f'Mode is not contained in filename of {path}')
-    
-        m=VSMMeasurement(filepath=path, 
-                         sample=self, 
-                         mode=mode)
+            raise ValueError(f"Mode is not contained in filename of {path}")
+
+        m = VSMMeasurement(filepath=path, sample=self, mode=mode)
 
         return m
 
-
     def add_vsm_measurements_by_folder(self, folder_path, paralelle=False):
-
         """
-        bind multiple vsm measurement by folder name
+        bind multiple vsm measurement by folder name,
+
         """
         if os.name != "posix":
             set_start_method("spawn", force=True)
 
-        if 'IP' in folder_path:
-            orientation = "In Plane"
-        elif 'OOP' in folder_path:
-            orientation = "Out of Plane"
+        if self.orientation is None:
+            # check orietation from the folder name
+            if "IP" in folder_path:
+                orientation = "In Plane"
+            elif "OOP" in folder_path:
+                orientation = "Out of Plane"
+            else:
+                raise ValueError(
+                    f"Orientation is not contained in folderpath {folder_path}"
+                )
         else:
-            raise ValueError(f'Orientation is not contained in folderpath {folder_path}')
-        
+            orientation = self.orientation
+
         arg_list = [(folder_path + p, orientation) for p in os.listdir(folder_path)]
 
         if paralelle:
-            with Pool() as pool: 
+            with Pool() as pool:
                 measurements = pool.map(self._vsm_measurement_reader, arg_list)
 
             for m in measurements:
@@ -180,27 +185,24 @@ class Sample:
                 m = self._vsm_measurement_reader(args)
                 self.add_measurement(m)
 
-
     def __repr__(self):
         date = self.make_date if self.make_date else "Unknwon Date"
-        return (f'id: {self.id}, '
-                f'{self.name}, '
-                f'{self.mass}mg, '
-                f'made in {date}.')
-    
+        return f"id: {self.id}, {self.name}, {self.mass}mg, made in {date}."
 
     def add_phase_point(self, source, x, y, fwhm):
         self.phase_points.loc[len(self.phase_points)] = [source, x, y, fwhm]
 
-    def plot_phase_diagram(self,
-                           ax=None,
-                           mh_fwhm_cut=5000,
-                           mt_fwhm_cut=10,
-                           xlim=None,
-                           ylim=None,
-                           title=None,
-                           savepath=None,
-                           dpi=300):
+    def plot_phase_diagram(
+        self,
+        ax=None,
+        mh_fwhm_cut=5000,
+        mt_fwhm_cut=10,
+        xlim=None,
+        ylim=None,
+        title=None,
+        savepath=None,
+        dpi=300,
+    ):
         """
         Plot phase diagram using notebook-like style.
 
@@ -243,14 +245,14 @@ class Sample:
                     x=sub_df["temp"].values,
                     y=sub_df["field"].values,
                     yerr=err,
-                    **kwargs
+                    **kwargs,
                 )
             else:
                 ax.errorbar(
                     x=sub_df["temp"].values,
                     y=sub_df["field"].values,
                     xerr=err,
-                    **kwargs
+                    **kwargs,
                 )
 
         # MH: x=Temp, y=PeakField, yerr=FWHM/2
@@ -311,37 +313,48 @@ class Sample:
 
         return ax
 
-
     ## This function is not quite useful.
-    def plot_vsm(self, mode, ax=None, field=None, temperature=None, condition=None, susceptibility=True, legend: str|list='Exp Setting'):
+    def plot_vsm(
+        self,
+        mode,
+        ax=None,
+        field=None,
+        temperature=None,
+        condition=None,
+        susceptibility=True,
+        legend: str | list = "Exp Setting",
+    ):
 
         if not ax:
-            fig ,ax = plt.subplots()
+            fig, ax = plt.subplots()
 
         df = self.measurements_vsm
-        if mode=='MH':
-            df = self.measurements_vsm.sort_values('const temp')
+        if mode == "MH":
+            df = self.measurements_vsm.sort_values("const temp")
 
         if mode:
-            mask_mode = df['mode'] == mode
+            mask_mode = df["mode"] == mode
         else:
             mask_mode = True
-        
+
         if field:
-            mask_field = df['const field'] == field
+            mask_field = df["const field"] == field
         else:
             mask_field = True
-        
+
         if temperature:
-            mask_temp = df['const temp'] == temperature
+            mask_temp = df["const temp"] == temperature
         else:
             mask_temp = True
 
-
         df_filtered = df[mask_field & mask_mode & mask_temp]
         for index, row in df_filtered.iterrows():
-                if condition:
-                    if row['instance'].condition == condition:
-                        row['instance'].plot(ax=ax, susceptibility=susceptibility, legend=legend)
-                else:
-                        row['instance'].plot(ax=ax, susceptibility=susceptibility, legend=legend)
+            if condition:
+                if row["instance"].condition == condition:
+                    row["instance"].plot(
+                        ax=ax, susceptibility=susceptibility, legend=legend
+                    )
+            else:
+                row["instance"].plot(
+                    ax=ax, susceptibility=susceptibility, legend=legend
+                )
