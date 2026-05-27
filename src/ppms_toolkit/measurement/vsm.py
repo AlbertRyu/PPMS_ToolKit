@@ -103,9 +103,9 @@ class VSMMeasurement(Measurement):
             for col in df.columns:
                 if re.match(r"Moment", col):
                     df["chi"] = df[col] / self.const_field
-            if re.search(r"ZFC", filepath):
+            if re.search(r"ZFC", filepath.name):
                 self.condition = "ZFC"
-            elif re.search(r"FC", filepath):
+            elif re.search(r"FC", filepath.name):
                 self.condition = "FC"
             else:
                 self.condition = "Unknown Condition"
