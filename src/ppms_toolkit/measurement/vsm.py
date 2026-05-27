@@ -130,7 +130,13 @@ class VSMMeasurement(Measurement):
             )
 
     def plot(
-        self, mid=None, ax=None, susceptibility=True, legend: str | list = "Exp Setting"
+        self,
+        *,
+        mid=None,
+        ax=None,
+        susceptibility=True,
+        legend: str | list = "Exp Setting",
+        **kwargs,
     ):
 
         if ax is None:
@@ -153,6 +159,9 @@ class VSMMeasurement(Measurement):
 
         regex = "^Moment"
         ax.set_ylabel("Moment (emu / gram)")
+
+        kwargs.setdefault("label", label)
+
         if self.mode == "MT":
             if susceptibility:
                 regex = "chi"
@@ -160,14 +169,14 @@ class VSMMeasurement(Measurement):
             ax.plot(
                 df.filter(regex="^Temperature"),
                 df.filter(regex=regex).squeeze(),
-                label=label,
+                **kwargs,
             )
             ax.set_xlabel("Temperature(K)")
         elif self.mode == "MH":
             ax.plot(
                 df.filter(regex="Magnetic Field"),
                 df.filter(regex=regex).squeeze(),
-                label=label,
+                **kwargs,
             )
             ax.set_xlabel("Magnetic Field(Oe)")
         else:
