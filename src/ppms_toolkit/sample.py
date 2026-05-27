@@ -364,3 +364,5 @@ class Sample:
                 row["instance"].plot(
                     ax=ax, susceptibility=susceptibility, legend=legend
                 )
+
+        return ax
