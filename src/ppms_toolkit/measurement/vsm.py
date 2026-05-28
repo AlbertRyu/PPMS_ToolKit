@@ -94,7 +94,7 @@ class VSMMeasurement(Measurement):
         # Divide the Moment by, if there's none 1 sample mass.
         for col in df.columns:
             if re.match(r"Moment", col):
-                df[col] = df[col] / self.sample.mass
+                df[col] = df[col] / self.sample.mass / 1000
 
         if self.mode == "MT":
             self.const_field = (
